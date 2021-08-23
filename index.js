@@ -53,14 +53,6 @@ client.on("ready", async () => {
         }
     }
 
-    /* [ Events ] */
-    for(const event of eventsDir) {
-        const eventReq = require(`./events/${event}`);
-        if(eventReq.eventType == undefined)
-            continue;
-        client.on(eventReq.eventType, (...args) => eventReq.execute(...args, client));
-    }
-
     /* [ Channels ] */
     for(let channelrow of config.channels) {
         let channel;
