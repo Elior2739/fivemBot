@@ -1,0 +1,8 @@
+{
+    "client": {
+        "token": "TOKEN",
+        "guild": "GUILD ID"
+    },
+    "channels": [],
+    "messages": []
+}

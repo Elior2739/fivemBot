@@ -1,0 +1,17 @@
+{
+  "name": "lior-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm install && node index.js"
+  },
+  "author": "Lior",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^13.0.1",
+    "moment": "^2.29.1",
+    "node-fetch": "^2.6.1",
+    "popyt": "^5.0.0"
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "ips": {
+        "private-ip": "IP HERE",
+
+        "public-ip": "Unknown",
+        "ts-ip": "Unknown"
+    },
+
+    "status-message": {
+        "players-per-page": 32
+    }
+}
