@@ -18,7 +18,6 @@ client.on("ready", async () => {
 
     const filter = f => f.endsWith(".js")
     const commandsDir = readdirSync("./commands").filter(filter);
-    const eventsDir = readdirSync("./events").filter(filter);
     const customEventsDir = readdirSync("./custom-events").filter(filter);
     // Functions
 
