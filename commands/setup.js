@@ -14,10 +14,6 @@ module.exports = {
                 {
                     name: "fivem-status",
                     value: "fivem-status"
-                },
-                {
-                    name: "suggestion-channel",
-                    value: "suggestionChannel"
                 }
             ]
         },
@@ -84,38 +80,6 @@ module.exports = {
             writeFileSync("./config.json", JSON.stringify(config, null, 4))
             interaction.editReply({ content: "Sent Message Succesfuly!" });
 
-        } else if(thing == "suggestionChannel") {
-
-            interaction.reply({content: `Setting Channel...`, ephemeral: true})
-
-            let foundChannel = false;
-            for (let channelRow of config.channels)
-                if (channelRow.name == "suggestionChannel") {
-                    channelRow.id = channel.id
-                    foundChannel = true;
-                }
-
-            if(!foundChannel)
-                config.channels.push({name: "suggestionChannel", id: channel.id})
-
-            interaction.editReply({content: `Suggestion channel has been set to ${channel}`})
-            
-        } else if(thing == "bugChannel") {
-
-            interaction.reply({content: `Setting Channel...`, ephemeral: true})
-
-            let foundChannel = false;
-            for (let channelRow of config.channels)
-                if (channelRow.name == "bugChannel") {
-                    channelRow.id = channel.id
-                    foundChannel = true;
-                }
-
-            if(!foundChannel)
-                config.channels.push({name: "bugChannel", id: channel.id})
-
-            interaction.editReply({content: `Bug channel has been set to ${interaction.channel}`})
-            
         }
     },
 };
