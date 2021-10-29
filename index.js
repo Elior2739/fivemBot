@@ -9,8 +9,8 @@ let moment = require('moment')
 
 client.on("ready", async () => {
 
-    client.version = "1.0";
-    client.guild = await client.guilds.fetch(config.client.guild);
+    client.version = "1.2";
+    client.guild = await client.guilds.fetch(config.client.guild).catch(err => undefined);
     client.commands = [];
     client.cached_messages = {};
     client.cached_channels = {};
