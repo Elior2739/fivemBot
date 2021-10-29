@@ -104,6 +104,8 @@ client.on("ready", async () => {
         for(let customEvent of customEventsDir) {
             require(`./custom-events/${customEvent}`).execute(client);
         }
+    } else {
+        console.log(`[ERROR]:`, `Can't find bot's guild`);   
     }
     
     /* [ Ready ] */
