@@ -1,4 +1,4 @@
-const { Client, MessageEmbed } = require('discord.js');
+const { Client } = require('discord.js');
 const fivem_status = require('../data/fivem_status.json');
 const moment = require('moment');
 
@@ -8,21 +8,30 @@ module.exports = {
      */
     async execute(client) {
 
-        let embed = client.createEmbed()
-        .setFooter(`All Rights Reserved To No Name Server | Last Updated: ${moment().format()}`)
+        let embed = client.createEmbed("FiveM Status")
+        embed.footer.text += ` | Last Updated: ${moment().format()}`;
         embed.timestamp = undefined
 
         if(client.playersJson != undefined) {
+            let formatedPlayers = `${client.playersJson.length}/${client.infoJson.vars.sv_maxClients}`;
 
-            embed.setAuthor(`No Name Server FiveM Status | The Server Is Online - ${client.playersJson.length}/${client.infoJson.vars.sv_maxClients}`)
-            embed.setDescription(`**Space Taken:** ${percentage(client.playersJson.length, client.infoJson.vars.sv_maxClients)}%\n**Players:**: ${client.playersJson.length}/${client.infoJson.vars.sv_maxClients}`)
+            embed.setAuthor(`${embed.author.name.split("|")[0]} | The Server Is Online - ${formatedPlayers}`)
+            embed.setDescription(`
+            **Space Taken:** ${percentage(client.playersJson.length, client.infoJson.vars.sv_maxClients)}%
+            **Players:**: ${formatedPlayers}`)
             
+            client.playersJson.sort(function(a, b) {
+                return a.id - b.id;
+            });
+
             if(client.playersJson.length == 0) {
+
                 embed.addFields(
                     {name: "ID", value: "...", inline: true},
                     {name: "Name", value: "...", inline: true},
                     {name: "Discord", value: "...", inline: true}
                 )
+
             } else if(client.playersJson.length > +(client.infoJson.vars.sv_maxClients / 2)) {
                 let pages = {};
                 let currentPlayer = 1;
@@ -72,7 +81,7 @@ module.exports = {
 
         } else {
             embed.setDescription(`**Space Taken:** 0%\n**Players:**: ?/?`)
-            embed.setAuthor(`No Name Server FiveM Status | The Server Is Offline`)
+            embed.setAuthor(`${embed.author.name.split("|")[0]} | The Server Is Offline`)
 
             embed.addFields(
                 {name: "ID", value: "...", inline: true},
@@ -84,8 +93,6 @@ module.exports = {
 
         if(client.cached_messages["fivemStatus"] != undefined)
             client.cached_messages["fivemStatus"].edit({embeds: [embed]}).catch(err => err);
-
-        
 
         setTimeout(() => {
             this.execute(client);
@@ -100,6 +107,7 @@ function getDiscord(identifiers) {
     for(let identifier of identifiers)
         if(identifier.startsWith("discord:"))
             return `<@${identifier.replace("discord:", "")}>`
+
     return "Unknown";
 }
 
