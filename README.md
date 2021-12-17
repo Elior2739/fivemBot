@@ -1,4 +1,11 @@
 # FiveM Status Bot
+
+## Features
+
+- Slash Commands
+- Can show up to 256 players in one message.
+- Easy to run & setup
+
 ## How to run
 
 Requirements: Lastest version of node.js
