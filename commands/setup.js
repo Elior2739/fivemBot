@@ -61,7 +61,7 @@ module.exports = {
             if(!foundChannel)
                 config.channels.push({name: "fivemStatus", id: channel.id})
             
-            client.cached_channels["fivemStatus"] = channel.id;
+            client.cached_channels["fivemStatus"] = channel;
 
 
             let foundMessage = false;
