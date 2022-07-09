@@ -1,5 +1,7 @@
 # FiveM Status Bot
 
+Currently not working well because discord's embeds limit.
+
 ## Features
 
 - Slash Commands
