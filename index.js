@@ -9,6 +9,8 @@ let moment = require('moment')
 
 client.on("ready", async () => {
 
+    print("[INFO]:", "Please notice!, Currently the bot isn't working well because of discord update. Update soon")
+    
     client.version = "1.3";
     client.guild = await client.guilds.fetch(config.client.guild).catch(err => undefined);
     client.commands = [];
