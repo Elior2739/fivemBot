@@ -1,16 +1,14 @@
 {
-  "name": "lior-bot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "npm install && node index.js"
+  "name": "fivem-bot",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
   },
-  "author": "Lior",
-  "license": "ISC",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
   "dependencies": {
-    "discord.js": "^13.3.1",
-    "moment": "^2.29.1",
-    "node-fetch": "^2.6.1"
+    "discord.js": "^14.16.2"
   }
 }

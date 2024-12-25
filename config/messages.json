@@ -1,0 +1,19 @@
+{
+    "status": {
+        "type": "embed",
+
+        "changeTo": {
+            "online": {
+                "title": "%serverName% - Server Status",
+                "description": "the server is currently **online**, to join click [here](%serverCfxAddress%)\nThere are %clients% players currently. WOW %hostname%",
+                "color": 65280
+            },
+
+            "offline": {
+                "title": "%serverName% - Server Status",
+                "description": "the server is currently **offline**",
+                "color": 16711680
+            }
+        }
+    }
+}
