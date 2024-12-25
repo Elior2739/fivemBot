@@ -15,6 +15,9 @@ The result:
 
 ![image](https://github.com/user-attachments/assets/af9872e6-d1e4-4283-b771-1d852c8f44c0)
 
+
+For all placeholders go to [here](placeholders.md)
+
 ## Road Map
 - [x] Base of the bot: Commands handler, Event handler
 - [x] FiveM Server Listener: Listen to the FiveM server every x time (To do: make it configable)
