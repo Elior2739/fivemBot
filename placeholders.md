@@ -4,7 +4,7 @@ Automaticlly getting from the server info, If the server is offline and used it 
 
 | Placeholder         | Description         |
 | :----------- | :--------------: |
-| %clients% | Clients amount |
+| %clients% | Clients amount (Will change to %playersAmount% |
 | %gametype%    | Sometimes just an empty string (Will be removed) |
 | %hostname%    | Server name (Not pretty)   |
 | %mapname%    | Sometimes just an empty string or a map name (Will be removed) |
