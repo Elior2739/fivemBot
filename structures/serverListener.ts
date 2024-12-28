@@ -1,17 +1,17 @@
 import info from "../config/info.json"
-import type { FormatData, FormatDataOnline, ServerInfo } from "../types";
+import type { BasePlaceholders, ServerInfo, ServerPlaceholders } from "../types";
 import { Log } from "./logger"
 
 const serverStatusWorker = new Worker("./structures/workers/serverStatusWorker.ts");
 const linkCheck = ['https:', '', 'cfx.re', 'join'];
 
 let serverInfoNormal: ServerInfo | null = null;
-let serverFormatted: FormatData | FormatDataOnline = {
+let serverFormatted: BasePlaceholders | ServerPlaceholders = {
     serverName: "Loading...",
-    serverAddress: "Loading...",
     serverCfxAddress: "Loading...",
-    clients: 0,
-    serverOnline: false
+    currentPlayers: 0,
+    serverOnline: false,
+    serverOnline_S: "No"
 };
 
 const getCfxId = (address: string) => {
@@ -30,49 +30,62 @@ const getCfxId = (address: string) => {
     return addressSplitted[4];
 }
 
-
-const formatData = (serverInfo: ServerInfo | null) => { // Freaking type things. I hate typescript. TODO: Find a fucking fuck better way to do it
-    serverInfoNormal = serverInfo
-    
-    if (serverInfo != null) {
-        const resultObj = {
-            ...info,
-            serverOnline: true
-        } as FormatDataOnline
-
-        const serverInfoKeys = Object.keys(serverInfo.Data) as (keyof FormatDataOnline)[];
-        for (let index = 0; index < serverInfoKeys.length; index++) {
-            const key = serverInfoKeys[index];
-
-            if (key == "resources") {
-                // TODO: Do it
-                continue;
-            } else if (key == "vars") {
-                // TODO: Do it
-                continue;
-            } else if (key == "players") {
-                // TODO: Do it
-                continue;
-            } else if (key == "connectEndPoints") {
-                // TODO: Ignore it?
-                continue;
-            }
-
-            // @ts-ignore
-            resultObj[key] = serverInfo.Data[key];
-        }
-
-        serverFormatted = resultObj;
-        return
+const translate = {
+    currentPlayers: {
+        zero: "No Players",
+        one: "1 Player",
+        beyond: "Players"
+    },
+    maxPlayers: {
+        zero: "No one is allowed to join",
+        one: "1 Player Allowed",
+        beyond: "Max"
+    },
+    power: {
+        zero: "No Power",
+        one: "1 Upvote/Burst",
+        beyond: "Upvotes/Bursts"
     }
+}
 
-    const resultObj = {
+const stringifyPlaceholderNumber = (amount: number, type: "currentPlayers" | "maxPlayers" | "power" ): string => {
+    if(amount == 0) {
+        return translate[type].zero;
+    } else if(amount == 1) {
+        return translate[type].one;
+    } else {
+        return amount + " " + translate[type].beyond
+    }
+}
+
+const formatData = (serverInfo: ServerInfo | null): void => {
+    serverInfoNormal = serverInfo;
+    serverFormatted = (serverInfo == null ? { // BasePlaceholders
         ...info,
-        playersAmount: 0,
-        serverOnline: true
-    } as FormatData
+        serverOnline: false,
+        serverOnline_S: "No"
+    } as BasePlaceholders : { // ServerPlaceholders
+        ...info,
+        serverOnline: true,
+        serverOnline_S: "Yes",
 
-    serverFormatted = resultObj;
+        currentPlayers: serverInfo.Data.clients,
+        currentPlayers_S: stringifyPlaceholderNumber(serverInfo.Data.clients, "currentPlayers"),
+
+        maxPlayers: serverInfo.Data.sv_maxclients,
+        maxPlayers_S: stringifyPlaceholderNumber(serverInfo.Data.sv_maxclients, "maxPlayers"),
+
+        upvotePower: serverInfo.Data.upvotePower,
+        upvotePower_S: stringifyPlaceholderNumber(serverInfo.Data.upvotePower, "power"),
+        burstPower: serverInfo.Data.burstPower,
+        burstPower_S: stringifyPlaceholderNumber(serverInfo.Data.burstPower, "power"),
+    
+        ownerId: serverInfo.Data.ownerID,
+        ownerName: serverInfo.Data.ownerName,
+        ownerProfile: serverInfo.Data.ownerProfile,
+        ownerAvatar: serverInfo.Data.ownerAvatar,
+        
+    } as ServerPlaceholders)
 }
 
 const startServerListener = () => {
@@ -89,7 +102,6 @@ const startServerListener = () => {
             formatData(event.data.data as ServerInfo | null);
         }
     })
-
 }
 
 const getServerInfoNormal = () => serverInfoNormal;

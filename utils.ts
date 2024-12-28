@@ -1,10 +1,10 @@
-import type { FormatData } from "./types";
+import type { BasePlaceholders } from "./types";
 import type { APIEmbed, EmbedBuilder } from "discord.js";
 
 
-const formatJsonString = (str: string, data: FormatData) => {
+const formatJsonString = (str: string, data: BasePlaceholders) => {
     for(const formatterIndex in data) {
-        const value = data[(formatterIndex as keyof FormatData)];
+        const value = data[(formatterIndex as keyof BasePlaceholders)] ?? "No Data";
         str = str.replaceAll("%" + formatterIndex + "%", value as string);
     }
 

@@ -1,17 +1,23 @@
 {
     "status": {
         "type": "embed",
+        "ephemeral": true,
+        
+        "allowed": {
+            "role": "",
+            "permission": ""
+        },
 
         "changeTo": {
             "online": {
                 "title": "%serverName% - Server Status",
-                "description": "the server is currently **online**, to join click [here](%serverCfxAddress%)\nThere are %clients% players currently. WOW %hostname%",
+                "description": "The server is currently **Online**, to join click [here](%serverCfxAddress%)\nThere are %currentPlayers%/%maxPlayers% players currently.",
                 "color": 65280
             },
 
             "offline": {
                 "title": "%serverName% - Server Status",
-                "description": "the server is currently **offline**",
+                "description": "the server is currently **Offline**",
                 "color": 16711680
             }
         }

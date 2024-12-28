@@ -21,10 +21,11 @@ For all placeholders go to [here](placeholders.md)
 ## Road Map
 - [x] Base of the bot: Commands handler, Event handler
 - [x] FiveM Server Listener: Listen to the FiveM server every x time (To do: make it configable)
-- [ ] Make the formmating have more options example: from %clients% to %playerAmount% and more...
+- [x] Make the formmating have more options example: from %clients% to %playerAmount% and more...
 
 ### Base Commands:
 - [x] IP/Status
+- [x] Show all placeholders
 
 ### Systems:
 - [ ] Ticket System

@@ -13,14 +13,12 @@ const fetchServerInfo = async () => {
         return await response.json();
     }) as null | ServerInfo;
 
-    console.log("sent data")
     self.postMessage({type: "recieveData", data: serverData});
 }
 
 self.addEventListener("message", async (event) => {
     if(event.data.type == "start") {
         cfxId = event.data.data;
-        console.log("started")
         fetchServerInfo();
         setInterval(fetchServerInfo, 60000);
     }
