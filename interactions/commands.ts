@@ -1,15 +1,18 @@
 import getBaseEmbed from "../config/embed";
-import { status as statusData } from "../config/messages.json"
+import { status as statusData } from "../config/commands.json"
 import { getServerInfoFormatted } from "../structures/serverListener";
-import type { BasePlaceholders, Command, ServerPlaceholders } from "../types"
+import type { BasePlaceholders, Command, CommandData, ServerPlaceholders } from "../types"
 import { formatEmbed, formatJsonString } from "../utils";
+
 
 export default new Map<string | string[], Command>([
     [
         ["status", "ip"],
         {
             description: "A command to see the server status and ip",
-            default_member_permissions: statusData.allowed.permission,
+            default_member_permissions: (statusData.permission.type === "permission" ? statusData.permission.value : ""),
+            commandData: statusData,
+
             onInteract: async (interaction) => {
                 await interaction.deferReply({ephemeral: statusData.ephemeral});
 
@@ -17,7 +20,7 @@ export default new Map<string | string[], Command>([
                 const data = getServerInfoFormatted();
                 const embed = getBaseEmbed();
 
-                const embedData = data ? statusData.changeTo.online : statusData.changeTo.offline;
+                const embedData = data ? statusData.embedStates.online : statusData.embedStates.offline;
                 const newEmbed = formatJsonString(JSON.stringify(embedData), data);
 
                 interaction.editReply({embeds: [formatEmbed(embed, newEmbed)]})
@@ -45,7 +48,6 @@ export default new Map<string | string[], Command>([
                 embed.setDescription(str);
 
                 interaction.reply({embeds: [embed]});
-
 
             }
         }

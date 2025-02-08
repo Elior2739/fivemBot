@@ -3,12 +3,19 @@
         "type": "embed",
         "ephemeral": true,
         
-        "allowed": {
-            "role": "",
-            "permission": ""
+        "permission": {
+            "type": "role",
+            "value": "1103594726290116679",
+
+            "ignoreAdministrator": true
         },
 
-        "changeTo": {
+        "embedStates": {
+
+            "base": {
+                "title":"%serverName% - Server Status"
+            },
+
             "online": {
                 "title": "%serverName% - Server Status",
                 "description": "The server is currently **Online**, to join click [here](%serverCfxAddress%)\nThere are %currentPlayers%/%maxPlayers% players currently.",

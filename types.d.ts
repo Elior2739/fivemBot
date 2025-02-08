@@ -1,9 +1,24 @@
 import type { ApplicationCommandOption, CommandInteraction, PermissionFlags, PermissionResolvable, PermissionsBitField } from "discord.js";
 
+interface CommandData {
+    type: string;
+    ephemeral: boolean;
+
+    permission?: {
+        type: string | "role" | "permission";
+        value: string;
+
+        ignoreAdministrator: boolean;
+    }
+
+    embedStates?: Record<string, JsonEmbed>
+}
+
 interface Command {
     description: string,
     options?: ApplicationCommandOptionData[],
     default_member_permissions?: string,
+    commandData?: CommandData
 
     onInteract: (interaction: CommandInteraction) => void
 }
@@ -105,5 +120,6 @@ export {
     ServerInfoData,
 
     BasePlaceholders,
-    ServerPlaceholders
+    ServerPlaceholders,
+    CommandData
 }
