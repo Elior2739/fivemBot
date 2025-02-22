@@ -113,6 +113,10 @@ interface ServerPlaceholders extends BasePlaceholders {
     ownerAvatar: string;
 }
 
+interface CommandPlaceholders extends ServerPlaceholders {
+    
+}
+
 export {
     Command,
     JsonEmbed,

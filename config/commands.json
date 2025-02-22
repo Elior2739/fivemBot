@@ -4,10 +4,10 @@
         "ephemeral": true,
         
         "permission": {
-            "type": "role",
-            "value": "1103594726290116679",
+            "type": "permission",
+            "value": "SendMessages",
 
-            "ignoreAdministrator": true
+            "ignoreAdministrator": false
         },
 
         "embedStates": {
@@ -26,6 +26,59 @@
                 "title": "%serverName% - Server Status",
                 "description": "the server is currently **Offline**",
                 "color": 16711680
+            }
+        }
+    },
+
+    "suggest": {
+        "type": "embed",
+        "responesEphemeral": true,
+
+        "permission": {
+            "type": "role",
+            "value": "1103594726290116679",
+
+            "ignoreAdministrator": false
+        },
+
+        "modal": {
+            "custom_id": "suggestion",
+            "title": "Suggest a suggestion",
+            "components": [
+                {
+                    "type": 1,
+                    "components": [
+                        {
+                            "type": 4,
+                            "custom_id": "suggestion_text",
+                            "label": "What is the suggestion?",
+                            "style": 2,
+                            "max_length": 256
+                        }
+                    ]
+                }
+            ]
+        },
+
+        "embedStates": {
+            "tooLong": {
+                "title": "Error!",
+                "description": "The suggestion text is too long!"
+            },
+
+            "suggestion": {
+                "title": "New Suggestion!",
+                "fields": [
+                    {
+                        "name": "Member",
+                        "value": "%memberTag% (%memberName%)"
+                    },
+                    {
+                        "name": "Suggestion",
+                        "value": "%suggestion%",
+                        "inline": false
+                    }
+                ]
             }
         }
     }

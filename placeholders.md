@@ -20,6 +20,14 @@ Automaticlly getting from the server info, If the server is offline and used it 
 | %ownerAvatar% | Owner's cfx account avatar |
 
 
+# Only on interactions
+
+This data is shown only on interactions: Commands, Modals, etc...
+
+| Placeholder         | Description         |
+| :----------- | :--------------: |
+| %serverOnline% | true or false |
+
 
 # User Defined
 
@@ -29,3 +37,4 @@ This information is from the `info.json` file
 | :----------- | :--------------: |
 | %serverName%    | Server's name   |
 | %serverCfxAddress%    | Server's cfx address |
+| %mainGuild%    | Bot's main guild id |

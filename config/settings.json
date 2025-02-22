@@ -1,0 +1,8 @@
+{
+    "mainGuild": "",
+
+    "botStatus": {
+        "type": "watching",
+        "text": "%currentPlayers%"
+    }
+}
