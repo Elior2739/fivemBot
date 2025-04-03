@@ -1,9 +1,12 @@
 
+import { ActionRowBuilder, ButtonBuilder } from "discord.js";
 import registerEvents from "./events/main";
 import { handleInteraction } from "./interactions/main";
+import { fetchChannels } from "./structures/channelManager";
 import client from "./structures/client";
 import { Debug, Log } from "./structures/logger";
 import { startServerListener } from "./structures/serverListener";
+import { fetchSuggestions } from "./structures/features/suggestions";
 
 client.once("ready", (client) => {
     Log("info", "The client is ready as " + client.user.displayName)
@@ -12,4 +15,6 @@ client.once("ready", (client) => {
     client.on("interactionCreate", handleInteraction);
     registerEvents();
     startServerListener()
+    fetchChannels();
+    fetchSuggestions();
 })

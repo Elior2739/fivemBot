@@ -2,13 +2,14 @@ import type { BasePlaceholders } from "./types";
 import type { APIEmbed, EmbedBuilder } from "discord.js";
 
 
-const formatJsonString = (str: string, data: BasePlaceholders) => {
+const placeholderString = (str: string, data: BasePlaceholders, isEmbed: boolean) => {
     for(const formatterIndex in data) {
         const value = data[(formatterIndex as keyof BasePlaceholders)] ?? "No Data";
         str = str.replaceAll("%" + formatterIndex + "%", value as string);
     }
 
-    return JSON.parse(str) as APIEmbed;
+    
+    return isEmbed ? JSON.parse(str) as APIEmbed : str;
 }
 
 
@@ -45,6 +46,6 @@ const formatEmbed = (embed: EmbedBuilder, newEmbedData: APIEmbed) => {
 }
 
 export { 
-    formatJsonString,
+    placeholderString,
     formatEmbed,
 }

@@ -9,6 +9,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "discord.js": "^14.16.2"
+    "@types/node": "^22.13.5",
+    "discord.js": "^14.18.0",
+    "mysql2": "^3.12.0"
   }
 }

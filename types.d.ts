@@ -1,8 +1,9 @@
-import type { ApplicationCommandOption, CommandInteraction, PermissionFlags, PermissionResolvable, PermissionsBitField } from "discord.js";
+import type { ApplicationCommandOption, Base, CommandInteraction, PermissionFlags, PermissionResolvable, PermissionsBitField } from "discord.js";
+import type { RowDataPacket } from "mysql2";
 
 interface CommandData {
     type: string;
-    ephemeral: boolean;
+    responesEphemeral: boolean;
 
     permission?: {
         type: string | "role" | "permission";
@@ -88,7 +89,9 @@ interface ServerInfo {
     Data: ServerInfoData
 }
 
-interface BasePlaceholders {
+interface BasePlaceholders {}
+
+interface ServerBaseholders extends BasePlaceholders {
     serverName: string,
     serverCfxAddress: string,
 
@@ -113,8 +116,35 @@ interface ServerPlaceholders extends BasePlaceholders {
     ownerAvatar: string;
 }
 
-interface CommandPlaceholders extends ServerPlaceholders {
-    
+interface InteractionPlaceholders extends BasePlaceholders {
+    userTag: string;
+    userId: string;
+    userName: string;
+    memberName: string;
+}
+
+interface SuggestionPlaceholders extends BasePlaceholders {
+    suggestion: string;
+    suggestionId: string;
+}
+
+interface SuggestionSQLResult extends RowDataPacket {
+    id: number;
+    author: string;
+    text: string;
+    message: string;
+    admin: null | string;
+    adminResult: null | AdminResult;
+}
+
+interface SuggestersSQLResult extends RowDataPacket {
+    user_id: string;
+    type: SuggestionFeedback
+}
+
+interface Suggesters {
+    upvote: string[],
+    downvote: string[]
 }
 
 export {
@@ -125,5 +155,12 @@ export {
 
     BasePlaceholders,
     ServerPlaceholders,
+    InteractionPlaceholders,
+    SuggestionPlaceholders,
+    
+    SuggestionSQLResult,
+    SuggestersSQLResult,
+    Suggesters,
+
     CommandData
 }

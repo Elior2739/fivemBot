@@ -1,7 +1,7 @@
 {
     "status": {
         "type": "embed",
-        "ephemeral": true,
+        "responesEphemeral": true,
         
         "permission": {
             "type": "permission",
@@ -42,22 +42,20 @@
         },
 
         "modal": {
-            "custom_id": "suggestion",
-            "title": "Suggest a suggestion",
-            "components": [
-                {
-                    "type": 1,
-                    "components": [
-                        {
-                            "type": 4,
-                            "custom_id": "suggestion_text",
-                            "label": "What is the suggestion?",
-                            "style": 2,
-                            "max_length": 256
-                        }
-                    ]
-                }
-            ]
+            "modalTitle": "Suggest a suggestion",
+            "modalInputLabel": "What is the suggestion?"
+        },
+
+        "buttons": {
+            "upvote": {
+                "text": "Upvote",
+                "style": 3
+            },
+
+            "downvote": {
+                "text": "Downvote",
+                "style": 4
+            }
         },
 
         "embedStates": {
@@ -66,19 +64,34 @@
                 "description": "The suggestion text is too long!"
             },
 
+            "channelNotFound": {
+                "title": "Error!",
+                "description": "Suggestion channel not found, Please try again later\n"
+            },
+
             "suggestion": {
                 "title": "New Suggestion!",
+                "color": 16711680,
                 "fields": [
                     {
                         "name": "Member",
-                        "value": "%memberTag% (%memberName%)"
+                        "value": "%userTag% (%memberName%)",
+                        "inline": false
                     },
                     {
                         "name": "Suggestion",
-                        "value": "%suggestion%",
-                        "inline": false
+                        "value": "%suggestionText%",
+                        "inline": true
+                    },
+                    {
+                        "name": "Votes",
+                        "value": "%upvotes% Upvotes || %downvotes% Downvotes",
+                        "inline": true
                     }
-                ]
+                ],
+                "footer": {
+                    "text": "Suggestion ID: %suggestionId%"
+                }
             }
         }
     }

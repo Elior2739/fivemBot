@@ -1,4 +1,9 @@
-import { Database } from "bun:sqlite";
+import { createPool } from "mysql2/promise"
 
-const db = new Database(":bot:");
+const database = createPool(process.env.CONNECTION_URI || "");
 
+database.getConnection().catch((error) => {
+    console.log(error)
+})
+
+export default database;

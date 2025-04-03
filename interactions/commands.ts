@@ -1,10 +1,12 @@
 import getBaseEmbed from "../config/embed";
 import { status as statusData, suggest as suggestionData } from "../config/commands.json"
 import { getServerInfoFormatted } from "../structures/serverListener";
-import type { BasePlaceholders, Command, CommandData, ServerPlaceholders } from "../types"
-import { formatEmbed, formatJsonString } from "../utils";
+import type { BasePlaceholders, Command,  ServerPlaceholders } from "../types"
+import { formatEmbed, placeholderString } from "../utils";
+import { GuildMember, type APIEmbed } from "discord.js";
+import { getPlaceholderData, placeholderText } from "./main";
 
-
+ 
 export default new Map<string | string[], Command>([
     [
         ["status", "ip"],
@@ -14,16 +16,19 @@ export default new Map<string | string[], Command>([
             commandData: statusData,
 
             onInteract: async (interaction) => {
-                await interaction.deferReply({ephemeral: statusData.ephemeral});
+                if(!(interaction.member instanceof GuildMember)) return;
 
+                await interaction.deferReply({ephemeral: statusData.responesEphemeral});
 
                 const data = getServerInfoFormatted();
                 const embed = getBaseEmbed();
 
                 const embedData = data ? statusData.embedStates.online : statusData.embedStates.offline;
-                const newEmbed = formatJsonString(JSON.stringify(embedData), data);
 
-                interaction.editReply({embeds: [formatEmbed(embed, newEmbed)]})
+                placeholderText(interaction.member, embedData as APIEmbed, null, (newEmbed) => {
+                    interaction.editReply({embeds: [formatEmbed(embed, newEmbed)]})
+                })
+
             }
         }
     ],
@@ -34,7 +39,10 @@ export default new Map<string | string[], Command>([
             default_member_permissions: "Administrator",
             onInteract: (interaction) => {
 
-                const data = getServerInfoFormatted();
+                const data = getPlaceholderData(interaction.member as GuildMember, {
+                    suggestionId: 0,
+                    suggestion: "Example for suggestion"
+                });
                 const embed = getBaseEmbed();
 
                 const dataKeys = Object.keys(data);
@@ -59,7 +67,24 @@ export default new Map<string | string[], Command>([
             description: "Suggest something to the server",
             default_member_permissions: (statusData.permission.type === "permission" ? statusData.permission.value : undefined),
             onInteract: async (interaction) => {
-                interaction.showModal(suggestionData.modal);
+                interaction.showModal({
+                    "custom_id": "suggestion",
+                    "title": suggestionData.modal.modalTitle,
+                    "components": [
+                        {
+                            "type": 1,
+                            "components": [
+                                {
+                                    "type": 4,
+                                    "custom_id": "suggestion_text",
+                                    "label": suggestionData.modal.modalInputLabel,
+                                    "style": 2,
+                                    "max_length": 256
+                                }
+                            ]
+                        }
+                    ]
+                });
             }
         }
     ]

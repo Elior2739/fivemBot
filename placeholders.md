@@ -26,8 +26,20 @@ This data is shown only on interactions: Commands, Modals, etc...
 
 | Placeholder         | Description         |
 | :----------- | :--------------: |
-| %serverOnline% | true or false |
+| %userTag% | User's tag |
+| %userId% | User Id |
+| %userName% | User's name |
+| %memberName% | Member's name (Display name) |
 
+
+# Only on specified commands
+
+## Suggestion
+
+| Placeholder         | Description         |
+| :----------- | :--------------: |
+| %suggestion% | Suggestion Text |
+| %suggestionId% | Suggestion Id |
 
 # User Defined
 
