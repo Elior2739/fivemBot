@@ -9,7 +9,7 @@
     "permission": {
         "type": "role",
         "value": "1103594726290116679",
-        "administratorBypass": false
+        "administratorBypass": true
     },
 
     "modal": {

@@ -53,11 +53,13 @@ class InternalCommand {
     public execute(interaction: CommandInteraction) {
         if(!(interaction.member instanceof GuildMember)) {
             interaction.reply({content: mainMessages["general_error"], flags: "Ephemeral"})
+            return;
         } else if(this.isUnderLimit(interaction.user.id)) {
             interaction.reply({content: mainMessages["cooldown"], flags: "Ephemeral"});
             return;
-        } else if(this.isAllowed(interaction.member)) {
+        } else if(!this.isAllowed(interaction.member)) {
             interaction.reply({content: mainMessages["no_permission"], flags: "Ephemeral"})
+            return;
         }
 
         this.handler(interaction);
