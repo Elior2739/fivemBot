@@ -1,9 +1,15 @@
-import {  ActionRow, ActionRowBuilder, ButtonBuilder, ChannelType, GuildMember, type ActionRowData, type APIMessageActionRowComponent, type MessageActionRowComponentBuilder, type ModalSubmitInteraction } from "discord.js"
-import { suggest as suggestionData } from "../config/commands.json"
-import channelMap from "../structures/channelManager";
-import { placeholderText } from "./main";
-import database from "../structures/database";
+import type { ModalSubmitInteraction } from "discord.js"
 import type { ResultSetHeader } from "mysql2";
+import { ChannelType, GuildMember } from "discord.js"
+
+import channelMap from "../structures/channelManager";
+import database from "../structures/database";
+
+import { placeholderText } from "./main";
+import { ephemeralFlag } from "../utils";
+
+import mainMessages from "../config/messages.json"
+import suggestionData from "../config/features/suggestion.json"
 
 export default new Map<string, (interaction: ModalSubmitInteraction) => void>([
     [
@@ -11,13 +17,14 @@ export default new Map<string, (interaction: ModalSubmitInteraction) => void>([
         async (interaction) => {
             if(!(interaction.member instanceof GuildMember)) return;
 
-            await interaction.deferReply({flags: (suggestionData.responesEphemeral ? ["Ephemeral"] : [])})
+            await interaction.deferReply({flags: ephemeralFlag(suggestionData.responesEphemeral)})
             const suggestionText = interaction.fields.getTextInputValue("suggestion_text");
 
             if(suggestionText.length > 256) {
                 placeholderText(interaction.member, suggestionData.embedStates.channelNotFound, null, (newContent) => {
                     interaction.editReply({embeds: [newContent]})
-                });;
+                });
+
                 return;
             }
 
@@ -26,9 +33,11 @@ export default new Map<string, (interaction: ModalSubmitInteraction) => void>([
             if(suggestionChannel == undefined || suggestionChannel.type != ChannelType.GuildText) {
                 placeholderText(interaction.member,
                     suggestionData.embedStates.channelNotFound,
-                    { // Extra Data
-                        suggestion: suggestionText,
-                        suggestionId: 0
+                    {
+                        suggestionText: suggestionText,
+                        suggestionId: 0,
+                        upvotes: 0,
+                        downvotes: 0
                     },
                     (newContent) => {
                         interaction.editReply({embeds: [newContent]})
@@ -38,16 +47,19 @@ export default new Map<string, (interaction: ModalSubmitInteraction) => void>([
                 return;
             }
 
-            database.execute<ResultSetHeader>("INSERT INTO `suggestions`(`author`) VALUES(?)", [
-                interaction.user.id
+            database.execute<ResultSetHeader>("INSERT INTO `suggestions`(`author`, `text`) VALUES(?, ?)", [
+                interaction.user.id,
+                suggestionText
             ]).then((result) => {
                 const suggestionId = result[0].insertId;
 
                 placeholderText(interaction.member as GuildMember,
                     suggestionData.embedStates.suggestion,
-                    { // Extra Data
+                    {
                         suggestionId,
-                        suggestionText: suggestionText
+                        suggestionText: suggestionText,
+                        upvotes: 0,
+                        downvotes: 0
                     },
                     (newContent) => {
                         suggestionChannel.send({embeds: [newContent], components: [{
@@ -70,13 +82,13 @@ export default new Map<string, (interaction: ModalSubmitInteraction) => void>([
                                 message.id,
                                 suggestionId
                             ]).then(() => {
-                                interaction.editReply({content: "Done"});
+                                interaction.editReply({content: suggestionData.messages["created_succesfully"]});
                             }).catch(() => {
                                 message.delete();
-                                interaction.editReply({content: "Error Occurred!"});
+                                interaction.editReply({content: mainMessages.general_error});
                             })
                         }).catch(() => {
-                            interaction.editReply({content: "Error Occurred!"});
+                            interaction.editReply({content: mainMessages.general_error});
                         })
                     }
                 );

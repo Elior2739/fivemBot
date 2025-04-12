@@ -1,7 +1,7 @@
 import database from "../database";
 import type { Message, User } from "discord.js";
 import messages from "../../config/messages.json"
-import { suggest as suggestionData } from "../../config/commands.json"
+import suggestionData from "../../config/features/suggestion.json"
 import type { Suggesters, SuggestionSQLResult, SuggestersSQLResult } from "../../types";
 import { placeholderText } from "../../interactions/main";
 
@@ -53,7 +53,7 @@ class Suggestion {
         const checks = (feedback == SuggestionFeedback.Downvote ? [this.suggesters.downvote, this.suggesters.upvote] : [this.suggesters.upvote, this.suggesters.downvote])
         
         if(checks[0].includes(userId)) {
-            return messages["suggestion_already"];
+            return suggestionData.messages["duplicate_feedback"];
         }
 
         if(checks[1].includes(userId)) {
@@ -67,7 +67,7 @@ class Suggestion {
             ]).catch(handleError)
 
             this.updateMessage(message)
-            return messages["suggestion_success"] + "a";
+            return suggestionData.messages["success"];
         }
 
         await database.execute("INSERT INTO `suggesters`(`suggestion`, `user_id`, `type`) VALUES(?, ?, ?)", [
@@ -78,7 +78,7 @@ class Suggestion {
 
         checks[0].push(userId);
         this.updateMessage(message);
-        return messages["suggestion_success"];
+        return suggestionData.messages["success"];
     }
 
 }

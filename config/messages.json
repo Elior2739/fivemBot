@@ -2,7 +2,6 @@
     "general_error": "An error happend, Please try again later.",
     "cooldown": "You are currently on cooldown.",
 
-    "suggestion_already": "You already gave this exect feedback.",
-    "suggestion_success": "You succesfully gave feedback!",
-    "suggestion_notfound": "Couldn't find this suggestion."
+    "no_permission": "You aren't allowed to use this command.",
+    "dm_command": "You can't use this command on DM."
 }

@@ -17,6 +17,8 @@ The result:
 
 
 For all placeholders go to [here](placeholders.md)
+To change correctly command's data go [here](commanddata.md)
+
 
 ## Road Map
 - [x] Base of the bot: Commands handler, Event handler

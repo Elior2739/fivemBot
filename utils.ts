@@ -2,6 +2,10 @@ import type { BasePlaceholders } from "./types";
 import type { APIEmbed, EmbedBuilder } from "discord.js";
 
 
+const ephemeralFlag = (ephemeral: boolean) => {
+    return ephemeral ? "Ephemeral" : undefined
+}
+
 const placeholderString = (str: string, data: BasePlaceholders, isEmbed: boolean) => {
     for(const formatterIndex in data) {
         const value = data[(formatterIndex as keyof BasePlaceholders)] ?? "No Data";
@@ -11,7 +15,6 @@ const placeholderString = (str: string, data: BasePlaceholders, isEmbed: boolean
     
     return isEmbed ? JSON.parse(str) as APIEmbed : str;
 }
-
 
 const formatEmbed = (embed: EmbedBuilder, newEmbedData: APIEmbed) => {
     if(newEmbedData.author != undefined) {
@@ -46,6 +49,7 @@ const formatEmbed = (embed: EmbedBuilder, newEmbedData: APIEmbed) => {
 }
 
 export { 
+    ephemeralFlag,
     placeholderString,
     formatEmbed,
 }

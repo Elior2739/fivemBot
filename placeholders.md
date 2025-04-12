@@ -40,6 +40,10 @@ This data is shown only on interactions: Commands, Modals, etc...
 | :----------- | :--------------: |
 | %suggestion% | Suggestion Text |
 | %suggestionId% | Suggestion Id |
+| %suggestionText% | The text of the suggestion |
+| %upvotes% | The upvotes of the suggestion |
+| %downvotes% | The downvotes of the suggestion |
+
 
 # User Defined
 

@@ -2,24 +2,39 @@ import type { ApplicationCommandOption, Base, CommandInteraction, PermissionFlag
 import type { RowDataPacket } from "mysql2";
 
 interface CommandData {
-    type: string;
     responesEphemeral: boolean;
 
-    permission?: {
+    cooldown: {
+        enabled: boolean;
+        time: number;
+    };
+
+    permission: {
         type: string | "role" | "permission";
         value: string;
 
-        ignoreAdministrator: boolean;
+        administratorBypass: boolean;
     }
+
+    modal?: {
+        modalTitle: string;
+        modalInputLabel: string;
+    }
+
+    buttons?: Record<string, {
+        text: string;
+        style: number
+    }>
 
     embedStates?: Record<string, JsonEmbed>
 }
 
 interface Command {
-    description: string,
-    options?: ApplicationCommandOptionData[],
-    default_member_permissions?: string,
-    commandData?: CommandData
+    description: string;
+    options?: ApplicationCommandOptionData[];
+    default_member_permissions?: string;
+    commandData?: CommandData;
+    cooldowns?: [];
 
     onInteract: (interaction: CommandInteraction) => void
 }
@@ -89,14 +104,11 @@ interface ServerInfo {
     Data: ServerInfoData
 }
 
-interface BasePlaceholders {}
-
-interface ServerBaseholders extends BasePlaceholders {
+interface BasePlaceholders {
+    serverOnline: boolean;
+    serverOnline_S: string;
     serverName: string,
     serverCfxAddress: string,
-
-    serverOnline: boolean
-    serverOnline_S: string;
 }
 
 interface ServerPlaceholders extends BasePlaceholders {
@@ -123,10 +135,14 @@ interface InteractionPlaceholders extends BasePlaceholders {
     memberName: string;
 }
 
-interface SuggestionPlaceholders extends BasePlaceholders {
-    suggestion: string;
-    suggestionId: string;
+interface SuggestionPlaceholders {
+    suggestionId: number;
+    suggestionText: string;
+    upvotes: number;
+    downvotes: number;
 }
+
+type ExtraPlaceHolders = SuggestionPlaceholder;
 
 interface SuggestionSQLResult extends RowDataPacket {
     id: number;
@@ -157,6 +173,7 @@ export {
     ServerPlaceholders,
     InteractionPlaceholders,
     SuggestionPlaceholders,
+    ExtraPlaceHolders,
     
     SuggestionSQLResult,
     SuggestersSQLResult,

@@ -1,0 +1,74 @@
+{
+    "responesEphemeral": true,
+    
+    "cooldown": {
+        "enabled": true,
+        "time": 10
+    },
+
+    "permission": {
+        "type": "role",
+        "value": "1103594726290116679",
+        "administratorBypass": false
+    },
+
+    "modal": {
+        "modalTitle": "Suggest a suggestion",
+        "modalInputLabel": "What is the suggestion?"
+    },
+
+    "buttons": {
+        "upvote": {
+            "text": "Upvote",
+            "style": 3
+        },
+        "downvote": {
+            "text": "Downvote",
+            "style": 4
+        }
+    },
+
+    "embedStates": {
+        "tooLong": {
+            "title": "Error!",
+            "description": "The suggestion text is too long!"
+        },
+
+        "channelNotFound": {
+            "title": "Error!",
+            "description": "Suggestion channel not found, Please try again later\n"
+        },
+
+        "suggestion": {
+            "title": "New Suggestion!",
+            "color": 16711680,
+            "fields": [
+                {
+                    "name": "Member",
+                    "value": "%userTag% (%memberName%)",
+                    "inline": false
+                },
+                {
+                    "name": "Suggestion",
+                    "value": "%suggestionText%",
+                    "inline": true
+                },
+                {
+                    "name": "Votes",
+                    "value": "%upvotes% Upvotes || %downvotes% Downvotes",
+                    "inline": true
+                }
+            ],
+            "footer": {
+                "text": "Suggestion ID: %suggestionId%"
+            }
+        }
+    },
+    
+    "messages": {
+        "created_succesfully": "You succesfully sent a suggestion.",
+        "duplicate_feedback": "You already gave this exect feedback.",
+        "success": "You succesfully gave feedback!",
+        "notfound": "Couldn't find this suggestion."
+    }
+}

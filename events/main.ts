@@ -15,7 +15,7 @@ const events = [
 
 const eventExist = (eventName: string) => discordjsEvents.includes(eventName);
 
-const registerEvents = () => {
+const RegisterEvents = () => {
     let eventsRegistered = 0;
 
     for(let i = 0; i < events.length; i++) {
@@ -34,4 +34,4 @@ const registerEvents = () => {
     Log("info", eventsRegistered + " Event(s) registered.");
 };
 
-export default registerEvents;
+export default RegisterEvents;
