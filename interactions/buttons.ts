@@ -1,12 +1,11 @@
 import type { ButtonInteraction } from "discord.js";
-import suggestions from "../structures/features/suggestions";
 import suggestionData from "../config/features/suggestion.json"
-import { SuggestionFeedback } from "../structures/features/suggestions";
+import SuggestionManager, { SuggestionFeedback } from "../structures/features/Suggestions/SuggestionManager";
 import { ephemeralFlag } from "../utils";
 
 const handleFeedback = async (interaction: ButtonInteraction) => {
     const type = interaction.customId == "suggestion_upvote" ? SuggestionFeedback.Upvote : SuggestionFeedback.Downvote;
-    const suggestion = suggestions.get(interaction.message.id);
+    const suggestion = SuggestionManager.searchSuggestion(interaction.message.id);
 
     if(suggestion == null) {
         interaction.reply({content: suggestionData.messages["notfound"], flags: ephemeralFlag(suggestionData.responesEphemeral)});

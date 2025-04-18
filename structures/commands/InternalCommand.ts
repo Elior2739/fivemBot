@@ -1,4 +1,4 @@
-import { GuildMember, PermissionsBitField, type APIApplicationCommandOption, type ApplicationCommandData, type CommandInteraction, type PermissionResolvable, type User } from "discord.js";
+import { GuildMember, PermissionsBitField, type APIApplicationCommandBasicOption, type APIApplicationCommandOption, type ApplicationCommandData, type ApplicationCommandOptionData, type BaseApplicationCommandOptionsData, type CommandInteraction, type PermissionResolvable } from "discord.js";
 import type { CommandData } from "../../types";
 import mainMessages from "../../config/messages.json";
 
@@ -7,14 +7,14 @@ class InternalCommand {
     private name: string | string[];
     private description: string;
     private commandData: CommandData | undefined;
-    private options: APIApplicationCommandOption[] | undefined;
+    private readonly options: ApplicationCommandOptionData[] | undefined;
     private nsfw: boolean;
 
     private cooldowns: Record<string, number> = {};
 
     private handler;
 
-    constructor(name: string | string[], description: string, options: APIApplicationCommandOption[], nsfw = false, commandData: CommandData | undefined, handler: (interaction: CommandInteraction) => void) {
+    constructor(name: string | string[], description: string, options: ApplicationCommandOptionData[] = [], nsfw = false, commandData: CommandData | undefined, handler: (interaction: CommandInteraction) => void) {
         this.name = name;
         this.description = description;
         this.commandData = commandData;
@@ -65,28 +65,28 @@ class InternalCommand {
         this.handler(interaction);
     }
 
-    public toJSON() {
-        if(this.name instanceof Array) {
-            const result = [];
-
-            for(let index = 0; index < this.name.length; index++) {
-                result.push({
-                    name: this.name[index],
-                    description: this.description,
-                    options: this.options,
-                    nsfw: this.nsfw
-                })
-            }
-
-            return result as ApplicationCommandData[];
-        }
-
-        return [{
-            name: this.name,
+    private JSONObject(name: string): ApplicationCommandData {
+        return {
+            name,
             description: this.description,
             options: this.options,
-            nsfw: this.nsfw
-        }] as ApplicationCommandData[];
+            nsfw: this.nsfw,
+            defaultMemberPermissions: this.commandData?.permission.type == "permission" ? PermissionsBitField.resolve(this.commandData?.permission.value as PermissionResolvable) : undefined
+        }
+    }
+
+    public toJSON(): ApplicationCommandData[] {
+        if(this.name instanceof Array) {
+            const result: ApplicationCommandData[] = [];
+
+            for(let index = 0; index < this.name.length; index++) {
+                result.push(this.JSONObject(this.name[index]));
+            }
+
+            return result;
+        }
+
+        return [this.JSONObject(this.name)];
     }
 }
 

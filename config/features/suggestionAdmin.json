@@ -1,0 +1,81 @@
+{
+    "responesEphemeral": true,
+    
+    "cooldown": {
+        "enabled": false,
+        "time": 10
+    },
+
+    "permission": {
+        "type": "permission",
+        "value": "Administrator",
+        "administratorBypass": true
+    },
+
+    "embedStates": {
+        "suggestionanswered": {
+            "title": "New Suggestion!",
+            "color": 16711680,
+            "fields": [
+                {
+                    "name": "Member",
+                    "value": "%author% (%authorName%)",
+                    "inline": false
+                },
+                {
+                    "name": "Suggestion",
+                    "value": "%suggestionText%",
+                    "inline": true
+                },
+                {
+                    "name": "Votes",
+                    "value": "%upvotes% Upvotes || %downvotes% Downvotes",
+                    "inline": true
+                },
+                {
+                    "name": "ㅤ",
+                    "value": "ㅤ",
+                    "inline": true
+                },
+                {
+                    "name": "Answer",
+                    "value": "%suggestionAnswer%",
+                    "inline": true
+                },
+                {
+                    "name": "Admin",
+                    "value": "%userTag% (%memberName%)",
+                    "inline": true
+                }
+            ],
+            "footer": {
+                "text": "Suggestion ID: %suggestionId%"
+            }
+        },
+
+        "viewvotes": {
+            "title": "Suggestion (%suggestionId%) Votes!",
+            "color": 16711680,
+            "description": "**Upvotes:**\n%upvotesText%\n\n**Downvotes:**\n%downvotesText%",
+            "fields": [
+                {
+                    "name": "Author",
+                    "value": "%userTag% (%memberName%)",
+                    "inline": true
+                },
+                {
+                    "name": "Suggestion",
+                    "value": "%suggestionText%",
+                    "inline": true
+                }
+            ]
+        }
+    },
+    
+    "messages": {
+    },
+
+    "settings": {
+        "can_self_vote": true
+    }
+}

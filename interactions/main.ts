@@ -15,9 +15,11 @@ import commandManager from "../structures/commands/CommandManager";
 import CommandManager from "../structures/commands/CommandManager";
 
 const reloadCommands = async (guild: Guild) => {
+	console.log(CommandManager.toJSONCommands());
 	return await guild.commands.set(CommandManager.toJSONCommands()).then(() => {
 		return true;
 	}).catch((error) => {
+		console.log(error);
 		return false;
 	})
 }
@@ -62,7 +64,7 @@ const handleInteraction = (interaction: Interaction) => {
 		case InteractionType.ModalSubmit:
 			handleModal(interaction);
 			break;
-		case InteractionType.MessageComponent:
+ 		case InteractionType.MessageComponent:
 			if(interaction.isButton()) {
 				handleButton(interaction)
 			}

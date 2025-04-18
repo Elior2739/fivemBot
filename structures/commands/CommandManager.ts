@@ -1,42 +1,30 @@
-import type { APIApplicationCommand, APIApplicationCommandOption, ApplicationCommandData, ApplicationCommandDataResolvable, CommandInteraction } from "discord.js";
+import type { APIApplicationCommand, APIApplicationCommandOption, ApplicationCommandData, ApplicationCommandOptionData, CommandInteraction } from "discord.js";
 import type { CommandData } from "../../types";
 import InternalCommand from "./InternalCommand";
+import MultipleKeyValue from "../MultipleKeyValue";
 
 export default new class {
 
     constructor() {}
 
-    private keyToIndex: Record<string, number> = {};
-    private values: InternalCommand[] = [] 
+    private commands = new MultipleKeyValue<InternalCommand>()
 
-    registerCommand(name: string | string[], description: string, options: APIApplicationCommandOption[], nsfw = false, commandData: CommandData | undefined,  handler: (interaction: CommandInteraction) => void) {
-        const newCommandIndex = this.values.length
+    registerCommand(name: string | string[], description: string, options: ApplicationCommandOptionData[], nsfw = false, commandData: CommandData | undefined,  handler: (interaction: CommandInteraction) => void) {
         const internalCommand = new InternalCommand(name, description, options, nsfw, commandData, handler);
 
-        if(name instanceof Array) {
-            for(let index = 0; index < name.length; index++) {
-                this.keyToIndex[name[index]] = newCommandIndex;
-                this.values[newCommandIndex] = internalCommand
-            }
-        } else {
-            this.keyToIndex[name] = newCommandIndex;
-            this.values[newCommandIndex] = internalCommand
-        }
+        this.commands.set((Array.isArray(name) ? name : [name]), internalCommand);
     }
 
     searchCommand(name: string) {
-        if(this.keyToIndex[name] == undefined) {
-            return undefined;
-        }
-
-        return this.values[this.keyToIndex[name]];
+        return this.commands.searchValue(name);
     }
 
     toJSONCommands() {
         const result: ApplicationCommandData[] = [];
+        const values = this.commands.getValues();
 
-        for(let index = 0; index < this.values.length; index++) {
-            result.push(...this.values[index].toJSON())
+        for(let index = 0; index < values.length; index++) {
+            result.push(...values[index].toJSON())
         }
 
         return result;

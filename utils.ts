@@ -12,7 +12,6 @@ const placeholderString = (str: string, data: BasePlaceholders, isEmbed: boolean
         str = str.replaceAll("%" + formatterIndex + "%", value as string);
     }
 
-    
     return isEmbed ? JSON.parse(str) as APIEmbed : str;
 }
 

@@ -5,8 +5,9 @@ import { fetchChannels } from "./structures/channelManager";
 import client from "./structures/client";
 import { Debug, Log } from "./structures/logger";
 import { startServerListener } from "./structures/serverListener";
-import { fetchSuggestions } from "./structures/features/suggestions";
 import RegisterCommands from "./interactions/commands";
+import SuggestionManager from "./structures/features/Suggestions/SuggestionManager";
+import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 
 client.once("ready", (client) => {
     Log("info", "The client is ready as " + client.user.displayName)
@@ -19,5 +20,5 @@ client.once("ready", (client) => {
 
     startServerListener()
     fetchChannels();
-    fetchSuggestions();
+    SuggestionManager.fetchSuggestions();
 })

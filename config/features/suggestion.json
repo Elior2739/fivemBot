@@ -29,16 +29,6 @@
     },
 
     "embedStates": {
-        "tooLong": {
-            "title": "Error!",
-            "description": "The suggestion text is too long!"
-        },
-
-        "channelNotFound": {
-            "title": "Error!",
-            "description": "Suggestion channel not found, Please try again later\n"
-        },
-
         "suggestion": {
             "title": "New Suggestion!",
             "color": 16711680,
@@ -69,6 +59,11 @@
         "created_succesfully": "You succesfully sent a suggestion.",
         "duplicate_feedback": "You already gave this exect feedback.",
         "success": "You succesfully gave feedback!",
-        "notfound": "Couldn't find this suggestion."
+        "notfound": "Couldn't find this suggestion.",
+        "self_vote": "You can't vote on a suggestion you made!."
+    },
+
+    "settings": {
+        "can_self_vote": true
     }
 }

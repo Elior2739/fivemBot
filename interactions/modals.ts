@@ -10,6 +10,7 @@ import { ephemeralFlag } from "../utils";
 
 import mainMessages from "../config/messages.json"
 import suggestionData from "../config/features/suggestion.json"
+import SuggestionManager from "../structures/features/Suggestions/SuggestionManager";
 
 export default new Map<string, (interaction: ModalSubmitInteraction) => void>([
     [
@@ -21,29 +22,14 @@ export default new Map<string, (interaction: ModalSubmitInteraction) => void>([
             const suggestionText = interaction.fields.getTextInputValue("suggestion_text");
 
             if(suggestionText.length > 256) {
-                placeholderText(interaction.member, suggestionData.embedStates.channelNotFound, null, (newContent) => {
-                    interaction.editReply({embeds: [newContent]})
-                });
-
+                interaction.editReply({content: mainMessages.general_error});
                 return;
             }
 
             const suggestionChannel = channelMap.get("suggestions");
 
             if(suggestionChannel == undefined || suggestionChannel.type != ChannelType.GuildText) {
-                placeholderText(interaction.member,
-                    suggestionData.embedStates.channelNotFound,
-                    {
-                        suggestionText: suggestionText,
-                        suggestionId: 0,
-                        upvotes: 0,
-                        downvotes: 0
-                    },
-                    (newContent) => {
-                        interaction.editReply({embeds: [newContent]})
-                    }
-                );
-
+                interaction.editReply({content: mainMessages.general_error});
                 return;
             }
 
@@ -82,6 +68,7 @@ export default new Map<string, (interaction: ModalSubmitInteraction) => void>([
                                 message.id,
                                 suggestionId
                             ]).then(() => {
+                                SuggestionManager.addSuggestion(suggestionId, interaction.user.id, suggestionText, message.id, null, null, {upvote: [], downvote: []})
                                 interaction.editReply({content: suggestionData.messages["created_succesfully"]});
                             }).catch(() => {
                                 message.delete();

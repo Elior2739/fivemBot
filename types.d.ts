@@ -1,5 +1,6 @@
 import type { ApplicationCommandOption, Base, CommandInteraction, PermissionFlags, PermissionResolvable, PermissionsBitField } from "discord.js";
 import type { RowDataPacket } from "mysql2";
+import type { SuggestionFeedback } from "./structures/features/Suggestions/SuggestionManager";
 
 interface CommandData {
     responesEphemeral: boolean;
@@ -140,6 +141,8 @@ interface SuggestionPlaceholders {
     suggestionText: string;
     upvotes: number;
     downvotes: number;
+    upvotesText: string;
+    downvotesText: string;
 }
 
 type ExtraPlaceHolders = SuggestionPlaceholder;
@@ -151,6 +154,8 @@ interface SuggestionSQLResult extends RowDataPacket {
     message: string;
     admin: null | string;
     adminResult: null | AdminResult;
+    user_id?: string;
+    type?: SuggestionFeedback
 }
 
 interface SuggestersSQLResult extends RowDataPacket {
