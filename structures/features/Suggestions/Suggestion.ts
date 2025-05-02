@@ -1,9 +1,9 @@
 import database from "../../database";
-import type { Message, User } from "discord.js";
+import type { Message } from "discord.js";
 import messages from "../../../config/messages.json"
 import suggestionData from "../../../config/features/suggestion.json"
-import type { Suggesters, SuggestionSQLResult, SuggestersSQLResult } from "../../../types";
-import { placeholderText } from "../../../interactions/main";
+import type { Suggesters } from "../../../types";
+import { placeholderText } from "../../../utils";
 import { AdminResult, SuggestionFeedback } from "./SuggestionManager";
 
 
@@ -34,14 +34,14 @@ class Suggestion {
     }
 
     private updateMessage(message: Message) {
-        placeholderText(message.member, suggestionData.embedStates.suggestion, {
+        const newEmbed = placeholderText(message.member, suggestionData.embedStates.suggestion, {
             suggestionId: this.id,
             suggestionText: this.text,
             upvotes: this.suggesters.upvote.length,
             downvotes: this.suggesters.downvote.length
-        }, (newEmbed) => {
-            message.edit({embeds: [newEmbed]})
-        })
+        });
+
+        message.edit({embeds: [newEmbed]});
     }
 
     async setFeedback(userId: string, message: Message, feedback: SuggestionFeedback) {

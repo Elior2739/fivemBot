@@ -31,7 +31,7 @@ To change correctly command's data go [here](commanddata.md)
 
 ### Systems:
 - [ ] Ticket System
-- [ ] Suggestion System
+- [x] Suggestion System
 - [ ] Database Search (Search a player by id and connect it to his in game character)
 - [ ] Playtime Leaderboard
 - [ ] Server Status

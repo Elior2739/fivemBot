@@ -7,7 +7,8 @@ import { Debug, Log } from "./structures/logger";
 import { startServerListener } from "./structures/serverListener";
 import RegisterCommands from "./interactions/commands";
 import SuggestionManager from "./structures/features/Suggestions/SuggestionManager";
-import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import TicketManager from "./structures/features/Tickets/TicketManager";
+import RegisterInteractions from "./interactions/interactions";
 
 client.once("ready", (client) => {
     Log("info", "The client is ready as " + client.user.displayName)
@@ -17,8 +18,10 @@ client.once("ready", (client) => {
 
     RegisterEvents();
     RegisterCommands();
+    RegisterInteractions();
 
     startServerListener()
     fetchChannels();
     SuggestionManager.fetchSuggestions();
-})
+    TicketManager.fetchTickets();
+  })

@@ -1,4 +1,4 @@
-import { GuildMember, PermissionsBitField, type APIApplicationCommandBasicOption, type APIApplicationCommandOption, type ApplicationCommandData, type ApplicationCommandOptionData, type BaseApplicationCommandOptionsData, type CommandInteraction, type PermissionResolvable } from "discord.js";
+import { AutocompleteInteraction, ChatInputCommandInteraction, GuildMember, MessageContextMenuCommandInteraction, PermissionsBitField, UserContextMenuCommandInteraction, type ApplicationCommandData, type ApplicationCommandOptionData, type PermissionResolvable } from "discord.js";
 import type { CommandData } from "../../types";
 import mainMessages from "../../config/messages.json";
 
@@ -12,15 +12,19 @@ class InternalCommand {
 
     private cooldowns: Record<string, number> = {};
 
+    private contextHandler;
+    private autoCompleteHandler;
     private handler;
 
-    constructor(name: string | string[], description: string, options: ApplicationCommandOptionData[] = [], nsfw = false, commandData: CommandData | undefined, handler: (interaction: CommandInteraction) => void) {
+    constructor(name: string | string[], description: string, options: ApplicationCommandOptionData[] = [], nsfw = false, contextHandler: ((interaction: MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction) => void) | undefined,  autoCompleteHandler: ((interaction: AutocompleteInteraction) => void) | undefined ,commandData: CommandData | undefined, handler: (interaction: ChatInputCommandInteraction) => void) {
         this.name = name;
         this.description = description;
         this.commandData = commandData;
         this.options = options;
         this.nsfw = nsfw;
 
+        this.contextHandler = contextHandler;
+        this.autoCompleteHandler = autoCompleteHandler
         this.handler = handler
     }
 
@@ -50,7 +54,7 @@ class InternalCommand {
         return (permissionType == "role" ? member.roles.cache.has(permissionValue) : member.permissions.has(PermissionsBitField.resolve(permissionValue as PermissionResolvable))) || administratorBypass;
     }
 
-    public execute(interaction: CommandInteraction) {
+    public execute(interaction: ChatInputCommandInteraction) {
         if(!(interaction.member instanceof GuildMember)) {
             interaction.reply({content: mainMessages["general_error"], flags: "Ephemeral"})
             return;
@@ -63,6 +67,37 @@ class InternalCommand {
         }
 
         this.handler(interaction);
+    }
+
+    public context(interaction: MessageContextMenuCommandInteraction | UserContextMenuCommandInteraction) {
+        if(this.contextHandler == undefined) return;
+
+        if(!(interaction.member instanceof GuildMember)) {
+            interaction.reply({content: mainMessages["general_error"], flags: "Ephemeral"})
+            return;
+        } else if(this.isUnderLimit(interaction.user.id)) {
+            interaction.reply({content: mainMessages["cooldown"], flags: "Ephemeral"});
+            return;
+        } else if(!this.isAllowed(interaction.member)) {
+            interaction.reply({content: mainMessages["no_permission"], flags: "Ephemeral"})
+            return;
+        }
+
+        this.contextHandler(interaction);
+    }
+
+    public autoComplete(interaction: AutocompleteInteraction) {
+        if(this.autoCompleteHandler == undefined) return;
+
+        if(!(interaction.member instanceof GuildMember)) {
+            return;
+        } else if(this.isUnderLimit(interaction.user.id)) {
+            return;
+        } else if(!this.isAllowed(interaction.member)) {
+            return;
+        }
+
+        this.autoCompleteHandler(interaction);
     }
 
     private JSONObject(name: string): ApplicationCommandData {

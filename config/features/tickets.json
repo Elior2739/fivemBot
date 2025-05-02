@@ -1,0 +1,22 @@
+{
+    "responesEphemeral": true,
+    
+    "cooldown": {
+        "enabled": false,
+        "time": 10
+    },
+
+    "permission": {
+        "type": "permission",
+        "value": "Administrator",
+        "administratorBypass": true
+    },
+
+    "embedStates": {},
+    
+    "messages": {
+    },
+
+    "settings": {
+    }
+}

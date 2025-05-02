@@ -1,10 +1,51 @@
-import type { BasePlaceholders } from "./types";
-import type { APIEmbed, EmbedBuilder } from "discord.js";
+import { getServerInfoFormatted } from "./structures/serverListener";
+import type { BasePlaceholders, ExtraPlaceHolders } from "./types";
+import type { APIEmbed, GuildMember } from "discord.js";
 
 
 const ephemeralFlag = (ephemeral: boolean) => {
     return ephemeral ? "Ephemeral" : undefined
 }
+
+function placeholderText(
+	member: GuildMember | null,
+	content: string,
+	extra: null | ExtraPlaceHolders,
+  ): string;
+  
+function placeholderText(
+	member: GuildMember | null,
+	content: APIEmbed,
+	extra: null | ExtraPlaceHolders,
+  ): APIEmbed;
+
+function placeholderText(member: GuildMember | null, content: string | APIEmbed, extra: null | ExtraPlaceHolders) {
+	const data =  getPlaceholderData(member, extra)
+
+	const isEmbed = !(typeof content == "string")
+	const newContent = placeholderString(JSON.stringify(content), data, isEmbed);
+
+	if(isEmbed) {
+		return newContent as APIEmbed;
+	} else {
+		return newContent as string
+	}
+		
+}
+
+const getPlaceholderData = (member: GuildMember | null, extra: null | ExtraPlaceHolders) => {
+	return {
+		...extra,
+		...getServerInfoFormatted(),
+		...(member != null ? {
+			userTag: "<@" + member.user.id + ">",
+			userId: member.user.id,
+			userName: member.user.username,
+			memberName: member.displayName
+		} : {})
+	}
+}
+
 
 const placeholderString = (str: string, data: BasePlaceholders, isEmbed: boolean) => {
     for(const formatterIndex in data) {
@@ -15,40 +56,7 @@ const placeholderString = (str: string, data: BasePlaceholders, isEmbed: boolean
     return isEmbed ? JSON.parse(str) as APIEmbed : str;
 }
 
-const formatEmbed = (embed: EmbedBuilder, newEmbedData: APIEmbed) => {
-    if(newEmbedData.author != undefined) {
-        embed.setAuthor(newEmbedData.author);
-    }
-
-    if(newEmbedData.color != undefined) {
-        embed.setColor(newEmbedData.color);
-    }
-
-    if(newEmbedData.description != undefined) {
-        embed.setDescription(newEmbedData.description);
-    }
-
-    if(newEmbedData.footer != undefined) {
-        embed.setFooter(newEmbedData.footer);
-    }
-
-    if(newEmbedData.image != undefined) {
-        embed.setImage(newEmbedData.image.url);
-    }
-
-    if(newEmbedData.thumbnail != undefined) {
-        embed.setThumbnail(newEmbedData.thumbnail.url);
-    }
-
-    if(newEmbedData.title != undefined) {
-        embed.setTitle(newEmbedData.title);
-    }
-
-    return embed;
-}
-
 export { 
     ephemeralFlag,
-    placeholderString,
-    formatEmbed,
+    placeholderText
 }

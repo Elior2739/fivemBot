@@ -1,21 +1,27 @@
-import { ChannelType, GuildMember, GuildOnboarding } from "discord.js";
+import { ApplicationCommandOptionType, CategoryChannel, ChannelType, GuildMember, type GuildBasedChannel } from "discord.js";
 import { getServerInfoFormatted } from "../structures/serverListener";
 import statusData from "../config/features/status.json"
 import suggestionData from "../config/features/suggestion.json"
 import adminSuggestionData from "../config/features/suggestionAdmin.json"
+import ticketsAdmin from "../config/features/ticketsAdmin.json"
+import setupChannels from "../config/features/setupChannels.json"
 import { ephemeralFlag, } from "../utils";
-import { placeholderText } from "./main";
+import { placeholderText } from "../utils";
 import CommandManager from "../structures/commands/CommandManager";
 import mainMessages from "../config/messages.json"
 import SuggestionManager, { AdminResult } from "../structures/features/Suggestions/SuggestionManager";
 import channelMap from "../structures/channelManager";
-import client from "../structures/client";
 import database from "../structures/database";
+import TicketManager from "../structures/features/Tickets/TicketManager";
+import type { ResultSetHeader } from "mysql2/promise";
 
 
 const RegisterCommands = () => {
+    const ChoicesToType: Record<string, ChannelType> = {
+        "suggestions": ChannelType.GuildText
+    }
 
-    CommandManager.registerCommand(["status", "ip"], "View the server's status and ip", [], false, statusData, async (interaction) => {
+    CommandManager.registerCommand(["status", "ip"], "View the server's status and ip", [], false, undefined, undefined, statusData, async (interaction) => {
         if(!(interaction.member instanceof GuildMember)) {
             interaction.reply({content: mainMessages["general_error"], flags: "Ephemeral"});
             return;
@@ -26,12 +32,11 @@ const RegisterCommands = () => {
         const serverInfo = getServerInfoFormatted();
         const embedStyle = serverInfo.serverOnline ? statusData.embedStates.online : statusData.embedStates.offline;
         
-        placeholderText(interaction.member, embedStyle, null, (newContent) => {
-            interaction.editReply({embeds: [newContent]})
-        })
+        const newEmbed = placeholderText(interaction.member, embedStyle, null);
+        interaction.editReply({embeds: [newEmbed]});
     });
 
-    CommandManager.registerCommand("suggest", "Suggest a suggestion", [], false, suggestionData, (interaction) => {
+    CommandManager.registerCommand("suggest", "Suggest a suggestion", [], false, undefined, undefined, suggestionData, (interaction) => {
         interaction.showModal({
             "custom_id": "suggestion",
             "title": suggestionData.modal.modalTitle,
@@ -50,22 +55,22 @@ const RegisterCommands = () => {
                 }
             ]
         });
-    })
+    });
 
-    CommandManager.registerCommand("view_suggestion", "A command to view suggestion's votes", [
+    CommandManager.registerCommand("view-suggestion", "A command to view suggestion's votes", [
         {
             name: "id",
             description: "Suggestion ID",
             type: 4,
             required: true
         }
-    ], false, adminSuggestionData, async (interaction) => {
+    ], false, undefined, undefined, adminSuggestionData, async (interaction) => {
         if(!(interaction.member instanceof GuildMember)) {
             interaction.reply({content: mainMessages.general_error, flags: ephemeralFlag(adminSuggestionData.responesEphemeral)});
             return;
         }
         
-        const suggestionId = interaction.options.get("id", true).value as number
+        const suggestionId = interaction.options.getNumber("id", true);
         const suggestion = SuggestionManager.searchSuggestion(suggestionId);
 
         await interaction.deferReply({flags: ephemeralFlag(adminSuggestionData.responesEphemeral)});
@@ -87,16 +92,16 @@ const RegisterCommands = () => {
             downvotes += "<@" + suggesters.downvote[index] + ">\\n"
         }
 
-        placeholderText(interaction.member, adminSuggestionData.embedStates.viewvotes, {
+        const newEmbed = placeholderText(interaction.member, adminSuggestionData.embedStates.viewvotes, {
             suggestionId: suggestion.getId(),
             suggestionText: suggestion.getText(),
             upvotes: suggesters.upvote.length,
             downvotes: suggesters.downvote.length,
             upvotesText: upvotes,
             downvotesText: downvotes
-        }, (newEmbed) => {
-            interaction.editReply({embeds: [newEmbed]})
-        })
+        });
+
+        interaction.editReply({embeds: [newEmbed]})
     });
 
     CommandManager.registerCommand("answer-suggestion", "Answer to a suggestion", [
@@ -122,13 +127,13 @@ const RegisterCommands = () => {
                 }
             ]
         }
-    ], false, adminSuggestionData, async (interaction) => {
+    ], false, undefined, undefined, adminSuggestionData, async (interaction) => {
         if(!(interaction.member instanceof GuildMember)) {
             interaction.reply({content: mainMessages.general_error, flags: ephemeralFlag(adminSuggestionData.responesEphemeral)});
             return;
         }
 
-        const suggestionId = interaction.options.get("id", true).value as number
+        const suggestionId = interaction.options.getNumber("id", true)
         const suggestion = SuggestionManager.searchSuggestion(suggestionId);
 
         await interaction.deferReply({flags: ephemeralFlag(adminSuggestionData.responesEphemeral)});
@@ -138,7 +143,7 @@ const RegisterCommands = () => {
             return;
         }
 
-        const answer = interaction.options.get("answer", true).value as "approved" | "denined";
+        const answer = interaction.options.getString("answer", true) as "approved" | "denined";
         const answerEnum = answer == "approved" ? AdminResult.Approved : AdminResult.Denied;
 
         const suggestionChannel = channelMap.get("suggestions");
@@ -151,12 +156,10 @@ const RegisterCommands = () => {
         const message = await suggestionChannel.messages.fetch(suggestion.getMessage())
 
         if(!message) {
-            interaction.editReply({content: suggestionData.messages.notfound + " message"});
+            interaction.editReply({content: suggestionData.messages.notfound});
             return;
         }
 
-        console.log("Found meesage")
-        
         const suggesters = suggestion.getSuggesters();
 
         const result = await database.execute("UPDATE `suggestions` SET `admin` = ?, `adminResult` = ? WHERE `id` = ?", [
@@ -170,7 +173,7 @@ const RegisterCommands = () => {
         })
 
         if(result) {
-            placeholderText(interaction.member, adminSuggestionData.embedStates.suggestionanswered, {
+            const newEmbed = placeholderText(interaction.member, adminSuggestionData.embedStates.suggestionanswered, {
                 author: "<@" + suggestion.getAuthor() + ">",
                 authorName: interaction.guild?.members.cache.get(suggestion.getAuthor())?.displayName ?? "UNK",
                 suggestionAnswer: answer.charAt(0).toUpperCase() + answer.slice(1, answer.length),
@@ -180,17 +183,126 @@ const RegisterCommands = () => {
                 downvotes: suggesters.downvote.length,
                 upvotesText: "",
                 downvotesText: ""
-            }, (newEmbed) => {
-                message.edit({embeds: [newEmbed], components: []});
-                interaction.editReply({content: "Done!"})
             })
+            message.edit({embeds: [newEmbed], components: []});
+            interaction.editReply({content: "Done!"})
         } else {
             interaction.editReply({content: "db update"})
         }
-    })
+    });
 
+    CommandManager.registerCommand("setup-channel", "Setup channels", [
+        {
+            name: "channel_name",
+            description: "The channel's key",
+            type: ApplicationCommandOptionType.String,
+            required: true,
+            choices: [
+                {
+                    name: "Suggestions",
+                    value: "suggestions"
+                }
+            ]
+        },
+        {
+            name: "channel",
+            description: "The channel",
+            type: ApplicationCommandOptionType.Channel,
+            required: true,
+        }
+    ], false, undefined, undefined, setupChannels, async (interaction) => {
+        const key = interaction.options.getString("channel_name", true)
+        const channel = interaction.options.getChannel("channel", true)
 
+        await interaction.deferReply({flags: ephemeralFlag(setupChannels.responesEphemeral)});
 
+        if(channel.type != ChoicesToType[key] && ((channel.type < 1 || channel.type < 4) && channel.type != 1)) {
+            interaction.editReply({content: "Invalid channel type. Got: " + ChannelType[channel?.type ?? 0] + " Expected: " + ChannelType[ChoicesToType[key]]});
+            return;
+        }
+
+        channelMap.set(key, channel as GuildBasedChannel); // Checked on the if statement on top.
+        database.execute("INSERT INTO `channels`(`key`, `id`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `id` = ?", [
+            key,
+            channel.id,
+            channel.id
+        ])
+
+    });
+
+    CommandManager.registerCommand("create-category", "Creates ticket category (You can use existing channel)", [
+        {
+            name: "name",
+            description: "The category name",
+            type: ApplicationCommandOptionType.String,
+            required: true,
+        },
+        {
+            name: "category",
+            description: "The category",
+            type: ApplicationCommandOptionType.Channel,
+            required: false,
+            channel_types: [4]
+        }
+    ], false, undefined, undefined, ticketsAdmin, async (interaction) => {
+        if(interaction.guild == undefined) {
+            return;
+        };
+
+        const name = interaction.options.getString("name", true);
+        let channel = interaction.options.getChannel("category", false, [ChannelType.GuildCategory]);
+
+        await interaction.deferReply({flags: ephemeralFlag(ticketsAdmin.responesEphemeral)});
+
+        if(channel == null) {
+            channel = await interaction.guild.channels.create({
+                name,
+                type: ChannelType.GuildCategory
+            }).then((channel) => {
+                return channel;
+            }).catch((err) => {
+                return null;
+            })
+        }
+
+        database.execute<ResultSetHeader>("INSERT INTO `ticket_categories`(`channel`, `name`) VALUES(?, ?)", [
+            channel?.id,
+            name
+        ]).then((result) => {
+            TicketManager.addCategory(result[0].insertId, channel as CategoryChannel, name)
+            interaction.editReply({content: "Done!"})
+        })
+    });
+
+    CommandManager.registerCommand("message-ticket", "Send ticket's message", [], false, undefined, undefined, ticketsAdmin, async (interaction) => {
+        await interaction.deferReply({flags: ephemeralFlag(ticketsAdmin.responesEphemeral)});
+
+        if(interaction.channel == null || !interaction.channel?.isSendable()) {
+            return;
+        }
+
+        interaction.channel.send({
+            embeds:
+            [
+                ticketsAdmin.embedStates.message
+            ],
+        components: [{
+            type: 1,
+            components: [
+              {
+                type: 2,
+                custom_id: "ticket_categories",
+                label: ticketsAdmin.button.text,
+                style: ticketsAdmin.button.style,
+              }
+            ],
+          }]}).then((res) => {
+            interaction.editReply({content: "Done!"});
+          }).catch(() => {
+            interaction.editReply({content: "Failed to send message"})
+          })
+
+    });
 }
 
 export default RegisterCommands;

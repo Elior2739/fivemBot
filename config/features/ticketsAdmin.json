@@ -1,0 +1,34 @@
+{
+    "responesEphemeral": true,
+    
+    "cooldown": {
+        "enabled": false,
+        "time": 10
+    },
+
+    "permission": {
+        "type": "permission",
+        "value": "Administrator",
+        "administratorBypass": true
+    },
+
+    "button": {
+        "text": "Open Ticket",
+        "style": 3
+    },
+
+    "embedStates": {
+        "message": {
+            "title": "Ticket System",
+            "color": 16711680,
+            "description": "Press the button down below to create a ticket!"
+        }
+    },
+
+    "messages": {
+    },
+
+    "settings": {
+        "category_based": true
+    }
+}

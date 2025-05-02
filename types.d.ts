@@ -1,6 +1,7 @@
-import type { ApplicationCommandOption, Base, CommandInteraction, PermissionFlags, PermissionResolvable, PermissionsBitField } from "discord.js";
+import type { ApplicationCommandOption, Base, ChatInputCommandInteraction, CommandInteraction, PermissionFlags, PermissionResolvable, PermissionsBitField } from "discord.js";
 import type { RowDataPacket } from "mysql2";
 import type { SuggestionFeedback } from "./structures/features/Suggestions/SuggestionManager";
+import type { TicketState } from "./structures/features/Tickets/TicketManager";
 
 interface CommandData {
     responesEphemeral: boolean;
@@ -37,7 +38,7 @@ interface Command {
     commandData?: CommandData;
     cooldowns?: [];
 
-    onInteract: (interaction: CommandInteraction) => void
+    onInteract: (interaction: ChatInputCommandInteraction) => void
 }
 
 interface JsonEmbed {
@@ -158,6 +159,20 @@ interface SuggestionSQLResult extends RowDataPacket {
     type?: SuggestionFeedback
 }
 
+interface TicketCategoriesSQLResult extends RowDataPacket {
+    id: number;
+    channel: string;
+    name: string;
+}
+
+interface TicketsSQLResult extends RowDataPacket {
+    id: number;
+    category: number;
+    author: string;
+    channel: string;
+    state: TicketState
+}
+
 interface SuggestersSQLResult extends RowDataPacket {
     user_id: string;
     type: SuggestionFeedback
@@ -183,6 +198,9 @@ export {
     SuggestionSQLResult,
     SuggestersSQLResult,
     Suggesters,
+
+    TicketCategoriesSQLResult,
+    TicketsSQLResult,
 
     CommandData
 }
