@@ -1,6 +1,6 @@
 import type { AnySelectMenuInteraction, Interaction} from "discord.js"
 
-import { ButtonInteraction, Guild, ModalSubmitInteraction } from "discord.js";
+import { ButtonInteraction, CommandInteraction, Guild, ModalSubmitInteraction } from "discord.js";
 
 import { Debug } from "../structures/logger";
 
@@ -33,7 +33,7 @@ const handleInteraction = (interaction: Interaction) => {
 	const interactionType = getInteractionType(interaction);
 	if(!interactionType) return;
 
-	if(interaction.isCommand()) {
+	if(interaction instanceof CommandInteraction || interaction.isAutocomplete()) {
 		const command = commandManager.searchCommand(interaction.commandName)
 		if(!command) return;
 
@@ -48,7 +48,11 @@ const handleInteraction = (interaction: Interaction) => {
 		return;
 	}
 
-	InteractionManager.searchHandler((interaction as AnySelectMenuInteraction | ButtonInteraction | ModalSubmitInteraction).customId, interactionType);
+	const handler = InteractionManager.searchHandler(interaction.customId, interactionType);
+
+	if(handler) {
+		handler(interaction);
+	}
 }
 
 

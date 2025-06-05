@@ -9,6 +9,7 @@ import RegisterCommands from "./interactions/commands";
 import SuggestionManager from "./structures/features/Suggestions/SuggestionManager";
 import TicketManager from "./structures/features/Tickets/TicketManager";
 import RegisterInteractions from "./interactions/interactions";
+import MultipleKeyValue from "./structures/MultipleKeyValue";
 
 client.once("ready", (client) => {
     Log("info", "The client is ready as " + client.user.displayName)
@@ -24,4 +25,4 @@ client.once("ready", (client) => {
     fetchChannels();
     SuggestionManager.fetchSuggestions();
     TicketManager.fetchTickets();
-  })
+})

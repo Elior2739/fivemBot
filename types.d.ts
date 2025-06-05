@@ -163,6 +163,7 @@ interface TicketCategoriesSQLResult extends RowDataPacket {
     id: number;
     channel: string;
     name: string;
+    role: string | undefined;
 }
 
 interface TicketsSQLResult extends RowDataPacket {

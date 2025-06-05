@@ -10,6 +10,7 @@ const query = async <T extends RowDataPacket>(sql: string, params: any) => {
     return await database.query<T[]>(sql, params).then((result) => {
         return result[0];
     }).catch((error) => {
+        console.log(error)
         return undefined;
     })
 }

@@ -17,11 +17,22 @@
         "style": 3
     },
 
+    "modal": {
+        "modalTitle": "What is the reason for closing the ticket?",
+        "modalInputLabel": "The reason"
+    },
+
     "embedStates": {
         "message": {
             "title": "Ticket System",
             "color": 16711680,
             "description": "Press the button down below to create a ticket!"
+        },
+
+        "view-permission": {
+            "title": "Ticket System",
+            "color": 16711680,
+            "description": "%ticketPermission%"
         }
     },
 
@@ -29,6 +40,5 @@
     },
 
     "settings": {
-        "category_based": true
     }
 }

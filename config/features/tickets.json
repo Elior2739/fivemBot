@@ -12,11 +12,32 @@
         "administratorBypass": true
     },
 
-    "embedStates": {},
+    "buttons": {
+        "lock": {
+            "text": "Lock",
+            "style": 4
+        },
+        "close": {
+            "text": "Close",
+            "style": 3
+        }
+    },
+
+
+
+    "embedStates": {
+        "ticket": {
+            "title": "Ticket System",
+            "color": 16711680,
+            "description": "New ticket was opened by %userTag%!"
+        }
+    },
     
     "messages": {
     },
 
     "settings": {
+        "category_based": false,
+        "enable_lock": true
     }
 }

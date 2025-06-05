@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, CategoryChannel, ChannelType, GuildMember, type GuildBasedChannel } from "discord.js";
+import { ApplicationCommandOptionType, CategoryChannel, ChannelType, ComponentAssertions, GuildMember, type GuildBasedChannel } from "discord.js";
 import { getServerInfoFormatted } from "../structures/serverListener";
 import statusData from "../config/features/status.json"
 import suggestionData from "../config/features/suggestion.json"
@@ -14,6 +14,8 @@ import channelMap from "../structures/channelManager";
 import database from "../structures/database";
 import TicketManager from "../structures/features/Tickets/TicketManager";
 import type { ResultSetHeader } from "mysql2/promise";
+import Category from "../structures/features/Tickets/Category";
+import Ticket from "../structures/features/Tickets/Ticket";
 
 
 const RegisterCommands = () => {
@@ -22,18 +24,18 @@ const RegisterCommands = () => {
     }
 
     CommandManager.registerCommand(["status", "ip"], "View the server's status and ip", [], false, undefined, undefined, statusData, async (interaction) => {
-        if(!(interaction.member instanceof GuildMember)) {
-            interaction.reply({content: mainMessages["general_error"], flags: "Ephemeral"});
+        if (!(interaction.member instanceof GuildMember)) {
+            interaction.reply({ content: mainMessages["general_error"], flags: "Ephemeral" });
             return;
         }
 
-        await interaction.deferReply({flags: ephemeralFlag(statusData.responesEphemeral)});
+        await interaction.deferReply({ flags: ephemeralFlag(statusData.responesEphemeral) });
 
         const serverInfo = getServerInfoFormatted();
         const embedStyle = serverInfo.serverOnline ? statusData.embedStates.online : statusData.embedStates.offline;
-        
+
         const newEmbed = placeholderText(interaction.member, embedStyle, null);
-        interaction.editReply({embeds: [newEmbed]});
+        interaction.editReply({ embeds: [newEmbed] });
     });
 
     CommandManager.registerCommand("suggest", "Suggest a suggestion", [], false, undefined, undefined, suggestionData, (interaction) => {
@@ -65,18 +67,18 @@ const RegisterCommands = () => {
             required: true
         }
     ], false, undefined, undefined, adminSuggestionData, async (interaction) => {
-        if(!(interaction.member instanceof GuildMember)) {
-            interaction.reply({content: mainMessages.general_error, flags: ephemeralFlag(adminSuggestionData.responesEphemeral)});
+        if (!(interaction.member instanceof GuildMember)) {
+            interaction.reply({ content: mainMessages.general_error, flags: ephemeralFlag(adminSuggestionData.responesEphemeral) });
             return;
         }
-        
+
         const suggestionId = interaction.options.getNumber("id", true);
         const suggestion = SuggestionManager.searchSuggestion(suggestionId);
 
-        await interaction.deferReply({flags: ephemeralFlag(adminSuggestionData.responesEphemeral)});
+        await interaction.deferReply({ flags: ephemeralFlag(adminSuggestionData.responesEphemeral) });
 
-        if(!suggestion) {
-            interaction.editReply({content: suggestionData.messages.notfound});
+        if (!suggestion) {
+            interaction.editReply({ content: suggestionData.messages.notfound });
             return;
         }
 
@@ -84,11 +86,11 @@ const RegisterCommands = () => {
         let upvotes = "";
         let downvotes = "";
 
-        for(let index = 0; index < suggesters.upvote.length; index++) {
+        for (let index = 0; index < suggesters.upvote.length; index++) {
             upvotes += "<@" + suggesters.upvote[index] + ">\\n"
         }
 
-        for(let index = 0; index < suggesters.downvote.length; index++) {
+        for (let index = 0; index < suggesters.downvote.length; index++) {
             downvotes += "<@" + suggesters.downvote[index] + ">\\n"
         }
 
@@ -101,14 +103,14 @@ const RegisterCommands = () => {
             downvotesText: downvotes
         });
 
-        interaction.editReply({embeds: [newEmbed]})
+        interaction.editReply({ embeds: [newEmbed] })
     });
 
     CommandManager.registerCommand("answer-suggestion", "Answer to a suggestion", [
         {
             name: "id",
             description: "Suggestion ID",
-            type: 4,
+            type: ApplicationCommandOptionType.Number,
             required: true
         },
         {
@@ -128,18 +130,18 @@ const RegisterCommands = () => {
             ]
         }
     ], false, undefined, undefined, adminSuggestionData, async (interaction) => {
-        if(!(interaction.member instanceof GuildMember)) {
-            interaction.reply({content: mainMessages.general_error, flags: ephemeralFlag(adminSuggestionData.responesEphemeral)});
+        if (!(interaction.member instanceof GuildMember)) {
+            interaction.reply({ content: mainMessages.general_error, flags: ephemeralFlag(adminSuggestionData.responesEphemeral) });
             return;
         }
 
         const suggestionId = interaction.options.getNumber("id", true)
         const suggestion = SuggestionManager.searchSuggestion(suggestionId);
 
-        await interaction.deferReply({flags: ephemeralFlag(adminSuggestionData.responesEphemeral)});
+        await interaction.deferReply({ flags: ephemeralFlag(adminSuggestionData.responesEphemeral) });
 
-        if(!suggestion) {
-            interaction.editReply({content: suggestionData.messages.notfound});
+        if (!suggestion) {
+            interaction.editReply({ content: suggestionData.messages.notfound });
             return;
         }
 
@@ -147,16 +149,16 @@ const RegisterCommands = () => {
         const answerEnum = answer == "approved" ? AdminResult.Approved : AdminResult.Denied;
 
         const suggestionChannel = channelMap.get("suggestions");
-        
-        if(suggestionChannel == undefined || suggestionChannel.type != ChannelType.GuildText) {
-            interaction.editReply({content: mainMessages.general_error + " channel"});
+
+        if (suggestionChannel == undefined || suggestionChannel.type != ChannelType.GuildText) {
+            interaction.editReply({ content: mainMessages.general_error + " channel" });
             return;
         }
 
         const message = await suggestionChannel.messages.fetch(suggestion.getMessage())
 
-        if(!message) {
-            interaction.editReply({content: suggestionData.messages.notfound});
+        if (!message) {
+            interaction.editReply({ content: suggestionData.messages.notfound });
             return;
         }
 
@@ -172,7 +174,7 @@ const RegisterCommands = () => {
             return false;
         })
 
-        if(result) {
+        if (result) {
             const newEmbed = placeholderText(interaction.member, adminSuggestionData.embedStates.suggestionanswered, {
                 author: "<@" + suggestion.getAuthor() + ">",
                 authorName: interaction.guild?.members.cache.get(suggestion.getAuthor())?.displayName ?? "UNK",
@@ -184,10 +186,11 @@ const RegisterCommands = () => {
                 upvotesText: "",
                 downvotesText: ""
             })
-            message.edit({embeds: [newEmbed], components: []});
-            interaction.editReply({content: "Done!"})
+            message.edit({ embeds: [newEmbed], components: [] });
+            SuggestionManager.removeSuggestion(suggestionId);
+            interaction.editReply({ content: "Done!" })
         } else {
-            interaction.editReply({content: "db update"})
+            interaction.editReply({ content: "db update" })
         }
     });
 
@@ -214,10 +217,10 @@ const RegisterCommands = () => {
         const key = interaction.options.getString("channel_name", true)
         const channel = interaction.options.getChannel("channel", true)
 
-        await interaction.deferReply({flags: ephemeralFlag(setupChannels.responesEphemeral)});
+        await interaction.deferReply({ flags: ephemeralFlag(setupChannels.responesEphemeral) });
 
-        if(channel.type != ChoicesToType[key] && ((channel.type < 1 || channel.type < 4) && channel.type != 1)) {
-            interaction.editReply({content: "Invalid channel type. Got: " + ChannelType[channel?.type ?? 0] + " Expected: " + ChannelType[ChoicesToType[key]]});
+        if (channel.type != ChoicesToType[key] && ((channel.type < 1 || channel.type < 4) && channel.type != 1)) {
+            interaction.editReply({ content: "Invalid channel type. Got: " + ChannelType[channel?.type ?? 0] + " Expected: " + ChannelType[ChoicesToType[key]] });
             return;
         }
 
@@ -230,7 +233,7 @@ const RegisterCommands = () => {
 
     });
 
-    CommandManager.registerCommand("create-category", "Creates ticket category (You can use existing channel)", [
+    CommandManager.registerCommand("ticket-category", "Creates ticket category (You can use existing channel)", [
         {
             name: "name",
             description: "The category name",
@@ -245,16 +248,16 @@ const RegisterCommands = () => {
             channel_types: [4]
         }
     ], false, undefined, undefined, ticketsAdmin, async (interaction) => {
-        if(interaction.guild == undefined) {
+        if (interaction.guild == undefined) {
             return;
         };
 
         const name = interaction.options.getString("name", true);
         let channel = interaction.options.getChannel("category", false, [ChannelType.GuildCategory]);
 
-        await interaction.deferReply({flags: ephemeralFlag(ticketsAdmin.responesEphemeral)});
+        await interaction.deferReply({ flags: ephemeralFlag(ticketsAdmin.responesEphemeral) });
 
-        if(channel == null) {
+        if (channel == null) {
             channel = await interaction.guild.channels.create({
                 name,
                 type: ChannelType.GuildCategory
@@ -270,38 +273,161 @@ const RegisterCommands = () => {
             name
         ]).then((result) => {
             TicketManager.addCategory(result[0].insertId, channel as CategoryChannel, name)
-            interaction.editReply({content: "Done!"})
+            interaction.editReply({ content: "Done!" })
         })
     });
 
-    CommandManager.registerCommand("message-ticket", "Send ticket's message", [], false, undefined, undefined, ticketsAdmin, async (interaction) => {
-        await interaction.deferReply({flags: ephemeralFlag(ticketsAdmin.responesEphemeral)});
+    CommandManager.registerCommand("ticket-message", "Send ticket's message", [], false, undefined, undefined, ticketsAdmin, async (interaction) => {
+        await interaction.deferReply({ flags: ephemeralFlag(ticketsAdmin.responesEphemeral) });
 
-        if(interaction.channel == null || !interaction.channel?.isSendable()) {
+        if (interaction.channel == null || !interaction.channel?.isSendable()) {
             return;
         }
 
         interaction.channel.send({
             embeds:
-            [
-                ticketsAdmin.embedStates.message
-            ],
-        components: [{
-            type: 1,
-            components: [
-              {
-                type: 2,
-                custom_id: "ticket_categories",
-                label: ticketsAdmin.button.text,
-                style: ticketsAdmin.button.style,
-              }
-            ],
-          }]}).then((res) => {
-            interaction.editReply({content: "Done!"});
-          }).catch(() => {
-            interaction.editReply({content: "Failed to send message"})
-          })
+                [
+                    ticketsAdmin.embedStates.message
+                ],
+            components: [{
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        custom_id: "ticket_categories",
+                        label: ticketsAdmin.button.text,
+                        style: ticketsAdmin.button.style,
+                    }
+                ],
+            }]
+        }).then((res) => {
+            interaction.editReply({ content: "Done!" });
+        }).catch(() => {
+            interaction.editReply({ content: "Failed to send message" })
+        })
 
+    });
+
+    CommandManager.registerCommand("ticket-permission", "Set's permission to ticket category", [
+        {
+            name: "type",
+            description: "Add or remove the permission",
+            type: ApplicationCommandOptionType.String,
+            required: true,
+            choices: [
+                {
+                    name: "Add",
+                    value: "add"
+                },
+                {
+                    name: "Remove",
+                    value: "remove"
+                }
+            ]
+        },
+        {
+            name: "role",
+            description: "Role",
+            type: ApplicationCommandOptionType.Role,
+            required: true
+        },
+        {
+            name: "category",
+            description: "Category name",
+            type: ApplicationCommandOptionType.String,
+            autocomplete: true,
+            required: true
+        }
+    ], false, undefined, (acInteraction) => {
+        const categories = [];
+        const values = TicketManager.getCategories().getValues();
+
+        for (let index = 0; index < values.length; index++) {
+            categories.push({
+                name: values[index].getName(),
+                value: values[index].getCategory().id
+            })
+        }
+
+        acInteraction.respond(categories)
+    }, ticketsAdmin, (interaction) => {
+        const option = interaction.options.getString("type", true);
+        const role = interaction.options.getRole("role", true);
+        const categoryId = interaction.options.getString("category", true)
+        const innerCategory = TicketManager.getCategories().searchValue(categoryId);
+
+        if (!innerCategory) {
+            interaction.reply({ content: "Something went wrong 1", flags: "Ephemeral" });
+            return;
+        }
+
+        if (role.id == (interaction.guild?.roles.everyone ?? "")) {
+            interaction.reply({ content: "Something went wrong 2", flags: "Ephemeral" });
+            return;
+        }
+
+        const roles = innerCategory.getRoles();
+
+        if (option == "add") {
+            if (roles.includes(role.id)) {
+                interaction.reply({ content: "This role already have the permission to see this category type.", flags: "Ephemeral" });
+                return;
+            }
+
+            roles.push(role.id);
+            database.execute("INSERT INTO `ticket_categories_permissions`(`category`, `role`) VALUES(?, ?)", [
+                innerCategory.getId(),
+                role.id
+            ])
+        } else {
+            if (!roles.includes(role.id)) {
+                interaction.reply({ content: "This role already don't have the permission to see this category type.", flags: "Ephemeral" });
+                return;
+            }
+
+            roles.splice(roles.indexOf(role.id), 1);
+            database.execute("DELETE FROM `ticket_categories_permissions` WHERE `role` = ? AND `category` = ?", [
+                role.id,
+                innerCategory.getId()
+            ])
+        }
+
+        interaction.reply({ content: "Done!", flags: "Ephemeral" });
+    })
+
+    CommandManager.registerCommand("ticket-permission-view", "A method to view all the roles by categories permissions", undefined, false, undefined, undefined, ticketsAdmin, (interaction) => {
+        if (!(interaction.member instanceof GuildMember)) {
+            interaction.reply({ content: mainMessages.general_error, flags: ephemeralFlag(ticketsAdmin.responesEphemeral) });
+            return;
+        }
+
+        const categories = TicketManager.getCategories().getValues();
+        
+        let text = "";
+
+        for(let index = 0; index < categories.length; index++) {
+            const category = categories[index];
+            const roles = category.getRoles();
+            let rolesText = "";
+
+            if(roles.length == 0) {
+                rolesText = "No roles are allowed.";
+            } else {
+                for(let jail = 0; jail < roles.length; jail++) {
+                    rolesText += "<@&" + roles[jail] + "> ";
+                }
+            }
+
+            text += `${category.getName()}:\\n${rolesText}\\n\\n`;
+        }
+
+        
+        const embed = placeholderText(interaction.member, ticketsAdmin.embedStates["view-permission"], {
+            ticketPermission: text 
+        })
+
+        interaction.reply({embeds: [embed], flags: ephemeralFlag(ticketsAdmin.responesEphemeral)});
+    
     });
 }
 

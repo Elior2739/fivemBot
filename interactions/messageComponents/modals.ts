@@ -1,6 +1,6 @@
-import type { ModalSubmitInteraction } from "discord.js"
 import type { ResultSetHeader } from "mysql2";
 import { ChannelType, GuildMember } from "discord.js"
+import ticketsDataAdmin from "../../config/features/ticketsAdmin.json"
 
 import channelMap from "../../structures/channelManager";
 import database from "../../structures/database";
@@ -12,6 +12,8 @@ import mainMessages from "../../config/messages.json"
 import suggestionData from "../../config/features/suggestion.json"
 import SuggestionManager from "../../structures/features/Suggestions/SuggestionManager";
 import InteractionManager, { InternalInteractionType } from "../../structures/InteractionManager";
+import TicketManager, { TicketState } from "../../structures/features/Tickets/TicketManager";
+import client from "../../structures/client";
 
 const Modals = () => {
     InteractionManager.registerHandler("suggestion", suggestionData, InternalInteractionType.Modal, async (interaction) => {
@@ -88,6 +90,49 @@ const Modals = () => {
         SuggestionManager.addSuggestion(suggestionInsertId, interaction.user.id, suggestionText, message.id, null, null, {upvote: [], downvote: []})
         interaction.editReply({content: suggestionData.messages["created_succesfully"]});
     })
+
+    InteractionManager.registerHandler("ticket_close_modal", ticketsDataAdmin, InternalInteractionType.Modal, async (interaction) => {
+        if(!interaction.channel) return;
+
+        const ticket = TicketManager.searchTicket(interaction.channel.id);
+        if(ticket == undefined) {
+            interaction.reply({content: mainMessages.general_error, flags: "Ephemeral"});
+            return;
+        }
+
+        if(ticket.getState() == TicketState.Locked) {
+            interaction.reply({content: mainMessages.general_error, flags: "Ephemeral"});
+            return;
+        }
+
+        const reason = interaction.fields.getTextInputValue("close_reason");
+
+        client.users.fetch(ticket.getAuthor()).then((user) => {
+            user.send({content: "Ticket closed with reason: " + reason});
+        })
+
+        const setStateStatus = await ticket.setState(TicketState.Closed);
+
+        if(!setStateStatus) {
+            interaction.reply({content: "Failed to close ticket", flags: "Ephemeral"});
+            return
+        }
+
+        const removeTicketStatus = TicketManager.removeTicket(ticket.getId());
+
+        if(!removeTicketStatus) {
+            ticket.setState(TicketState.Open);
+            interaction.reply({content: "Failed to remove ticket from the list.", flags: "Ephemeral"});
+        }
+
+        interaction.reply({content: "The ticket is going to be deleted in 5 seconds"});
+
+        setTimeout(() => {
+            interaction.channel?.delete()
+        }, 5000);
+    })
+
+    
 }
 
 export default Modals;

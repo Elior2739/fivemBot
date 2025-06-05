@@ -1,15 +1,24 @@
-import { Events } from "discord.js";
+import { Events, type ClientEvents } from "discord.js";
 import client from "../structures/client";
 import { Debug, Log } from "../structures/logger";
 
 import { handler as messageCreateHandler } from "./messageCreate"; 
+import { handler as channelDeleteHandler } from "./channelDelete"; 
+
 
 const discordjsEvents: string[] = Object.values(Events);
 
-const events = [
+const events: {
+    event: keyof ClientEvents,
+    handler: any
+}[] = [
     {
         event: "messageCreate",
         handler: messageCreateHandler
+    },
+    {
+        event: "channelDelete",
+        handler: channelDeleteHandler
     }
 ]
 

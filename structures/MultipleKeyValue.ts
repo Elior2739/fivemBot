@@ -20,6 +20,25 @@ export default class<V> {
         }
     }
 
+    delete(identifier: string | number) {
+        const valueIndex = this.keyToIndex[identifier];
+        if(valueIndex == undefined) return false;
+
+        const keys = Object.keys(this.keyToIndex);
+
+        for(let index = 0; index < keys.length; index++) {
+            const key = keys[index]
+            const keyValue = this.keyToIndex[key];
+
+            if(keyValue == valueIndex) {
+                delete this.keyToIndex[key];
+            }
+        }
+
+        this.values.splice(valueIndex, 1);
+        return true;
+    }
+
     getValues() {
         return this.values;
     }

@@ -31,7 +31,12 @@ export default new class {
     public searchHandler<T extends InternalInteractionType = InternalInteractionType>(id: string, type: T) {
         const interactionData = this.interactions[id];
 
+        if(interactionData == undefined) {
+            return;
+        }
+
         if(type != interactionData.type) {
+            console.log("Invalid type to interaction, Type got: " + type + " Exp: " + interactionData.type);
             // TODO: Log, Debug, Bye.
             return;
         }

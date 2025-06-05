@@ -21,7 +21,7 @@ export default new class {
 
     async fetchSuggestions() {
 
-        const suggestionsRaw = await query<SuggestionSQLResult>("SELECT `id`, `author`, `text`, `message`, `admin`, `adminResult`, `user_id`, `type`  FROM `suggestions` LEFT JOIN `suggesters` ON `suggesters`.`suggestion` = `suggestions`.`id`", []);
+        const suggestionsRaw = await query<SuggestionSQLResult>("SELECT `id`, `author`, `text`, `message`, `admin`, `adminResult`, `user_id`, `type`  FROM `suggestions` LEFT JOIN `suggesters` ON `suggesters`.`suggestion` = `suggestions`.`id` WHERE `adminResult` = NULL", []);
         if(suggestionsRaw == undefined) return;
 
         for(let index = 0; index < suggestionsRaw.length; index++) {
@@ -79,6 +79,10 @@ export default new class {
         )
 
         this.suggestions.set([id, message], suggestion)
+    }
+
+    removeSuggestion(identifier: string | number): boolean {
+        return this.suggestions.delete(identifier);
     }
 
     searchSuggestion(messageId: string | number): Suggestion | undefined {
