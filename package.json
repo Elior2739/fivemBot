@@ -2,6 +2,7 @@
   "name": "fivem-bot",
   "module": "index.ts",
   "type": "module",
+  "version": "0.0.5",
   "devDependencies": {
     "@types/bun": "latest"
   },
